@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pollinations AI - Free</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FAFAFA;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: #fff;
+            border-right: 1px solid #E5E5E5;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #10B981;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .free-tag {
+            display: inline-block;
+            background: #D1FAE5;
+            color: #059669;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: #F0F0F0;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: none;
+            background: transparent;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #fff;
+            color: #111;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            background: #FAFAFA;
+            border: 1px solid #E0E0E0;
+            border-radius: 10px;
+            padding: 0.7rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            height: 80px;
+            color: #333;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #10B981;
+            background: #fff;
+        }
+
+        .source-image {
+            border: 1px solid #E0E0E0;
+            border-radius: 10px;
+            padding: 0.5rem;
+            background: #FAFAFA;
+            display: none;
+        }
+
+        .source-image.visible {
+            display: block;
+        }
+
+        .source-image img {
+            max-width: 100%;
+            max-height: 120px;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .source-image-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-align: center;
+            margin-top: 0.3rem;
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.4rem;
+        }
+
+        .preset-btn {
+            background: #F0FDF4;
+            border: 1px solid #D1FAE5;
+            color: #059669;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            background: #10B981;
+            color: white;
+            border-color: #10B981;
+        }
+
+        select {
+            width: 100%;
+            background: #FAFAFA;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 0.6rem;
+            font-size: 0.85rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #10B981;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+        }
+
+        .btn-generate {
+            background: #10B981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: auto;
+        }
+
+        .btn-generate:hover {
+            background: #059669;
+        }
+
+        .btn-generate:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            display: none;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            background: #F5F5F5;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .image-container {
+            display: none;
+            max-width: 100%;
+            max-height: calc(100vh - 150px);
+            position: relative;
+        }
+
+        .image-container.visible {
+            display: block;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: calc(100vh - 150px);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-actions {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            border-color: #10B981;
+        }
+
+        .gallery {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            max-width: 90%;
+            overflow-x: auto;
+        }
+
+        .gallery:empty {
+            display: none;
+        }
+
+        .gallery-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .gallery-item:hover {
+            border-color: #10B981;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media (max-width: 800px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #E5E5E5;
+            }
+
+            .main {
+                min-height: 50vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <a href="/" class="back-link">← Back</a>
+
+            <div>
+                <h1>Pollinations AI <span class="free-tag">FREE</span></h1>
+                <p class="subtitle">Open source image generation</p>
+            </div>
+
+            <!-- Mode Toggle -->
+            <div>
+                <label>Mode</label>
+                <div class="mode-toggle">
+                    <button class="mode-btn active" onclick="setMode('create')" id="mode-create">✨ Create</button>
+                    <button class="mode-btn" onclick="setMode('edit')" id="mode-edit">🖌️ Edit</button>
+                </div>
+            </div>
+
+            <!-- Source Image Preview (for Edit mode) -->
+            <div class="source-image" id="source-image-container">
+                <img id="source-preview" src="" alt="Source image">
+                <div class="source-image-label">Source image (from cloud)</div>
+            </div>
+
+            <div>
+                <label id="prompt-label">Prompt</label>
+                <textarea id="prompt" placeholder="Describe your image..."></textarea>
+                <div class="presets" id="presets">
+                    <button class="preset-btn" onclick="usePreset('portrait')">Portrait</button>
+                    <button class="preset-btn" onclick="usePreset('landscape')">Landscape</button>
+                    <button class="preset-btn" onclick="usePreset('fantasy')">Fantasy</button>
+                    <button class="preset-btn" onclick="usePreset('anime')">Anime</button>
+                </div>
+            </div>
+
+            <div>
+                <label>Model & Size</label>
+                <div class="row-2">
+                    <select id="model">
+                        <option value="flux">FLUX (Best)</option>
+                        <option value="turbo">Turbo (Fast)</option>
+                        <option value="zimage">Z-Image</option>
+                    </select>
+                    <select id="resolution" onchange="setRes()">
+                        <option value="1024x1024">1024×1024</option>
+                        <option value="1280x720">1280×720</option>
+                        <option value="720x1280">720×1280</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-generate" id="gen-btn" onclick="generate()">Generate</button>
+            <p class="status" id="status">Generating...</p>
+        </aside>
+
+        <main class="main">
+            <div class="empty-state" id="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+                    <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" />
+                </svg>
+                <p>Your AI image will appear here</p>
+            </div>
+
+            <div class="image-container" id="image-container">
+                <img id="result-img" src="" alt="Generated">
+                <div class="image-actions">
+                    <button class="action-btn" onclick="useAsSource()" title="Edit this">🖌️</button>
+                    <button class="action-btn" onclick="downloadImage()" title="Download">⬇️</button>
+                    <button class="action-btn" onclick="closeImage()" title="Close">✕</button>
+                </div>
+            </div>
+
+            <div class="gallery" id="gallery"></div>
+        </main>
+    </div>
+
+    <script>
+        let currentMode = 'create';
+        let sourceB2Url = null;  // B2 public URL for editing
+        let width = 1024, height = 1024;
+        let galleryData = [];  // Store gallery with b2_url
+
+        const presets = {
+            portrait: "Professional portrait, soft lighting, shallow depth of field",
+            landscape: "Breathtaking landscape, golden hour, dramatic clouds",
+            fantasy: "Mystical forest, glowing mushrooms, ethereal fog, fantasy art",
+            anime: "Beautiful anime illustration, studio ghibli style, detailed"
+        };
+
+        const editPresets = {
+            style: "change the art style to oil painting",
+            lighting: "add warm golden hour lighting",
+            background: "change the background to a sunset beach",
+            remove: "remove the watermark and text"
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+            const createBtn = document.getElementById('mode-create');
+            const editBtn = document.getElementById('mode-edit');
+            const sourceContainer = document.getElementById('source-image-container');
+            const presetsDiv = document.getElementById('presets');
+            const promptLabel = document.getElementById('prompt-label');
+            const modelSelect = document.getElementById('model');
+            const prompt = document.getElementById('prompt');
+
+            if (mode === 'create') {
+                createBtn.classList.add('active');
+                editBtn.classList.remove('active');
+                sourceContainer.classList.remove('visible');
+                promptLabel.textContent = 'Prompt';
+                prompt.placeholder = 'Describe your image...';
+                
+                presetsDiv.innerHTML = `
+                    <button class="preset-btn" onclick="usePreset('portrait')">Portrait</button>
+                    <button class="preset-btn" onclick="usePreset('landscape')">Landscape</button>
+                    <button class="preset-btn" onclick="usePreset('fantasy')">Fantasy</button>
+                    <button class="preset-btn" onclick="usePreset('anime')">Anime</button>
+                `;
+                
+                modelSelect.innerHTML = `
+                    <option value="flux">FLUX (Best)</option>
+                    <option value="turbo">Turbo (Fast)</option>
+                    <option value="zimage">Z-Image</option>
+                `;
+            } else {
+                createBtn.classList.remove('active');
+                editBtn.classList.add('active');
+                promptLabel.textContent = 'What to change';
+                prompt.placeholder = 'Describe what you want to change...';
+                
+                presetsDiv.innerHTML = `
+                    <button class="preset-btn" onclick="useEditPreset('style')">🎨 Style</button>
+                    <button class="preset-btn" onclick="useEditPreset('lighting')">💡 Light</button>
+                    <button class="preset-btn" onclick="useEditPreset('background')">🌅 BG</button>
+                    <button class="preset-btn" onclick="useEditPreset('remove')">🗑️ Remove</button>
+                `;
+                
+                modelSelect.innerHTML = `
+                    <option value="kontext">Kontext (Edit)</option>
+                `;
+
+                // Show source if available
+                if (sourceB2Url) {
+                    sourceContainer.classList.add('visible');
+                }
+            }
+        }
+
+        function usePreset(key) {
+            document.getElementById('prompt').value = presets[key];
+        }
+
+        function useEditPreset(key) {
+            document.getElementById('prompt').value = editPresets[key];
+        }
+
+        function setRes() {
+            const [w, h] = document.getElementById('resolution').value.split('x');
+            width = parseInt(w);
+            height = parseInt(h);
+        }
+
+        // Use generated image as source for editing
+        function useAsSource() {
+            const imgSrc = document.getElementById('result-img').src;
+            if (!imgSrc) return;
+            
+            // Find the B2 URL for this image from gallery data
+            const localPath = imgSrc.replace(window.location.origin, '');
+            const item = galleryData.find(g => g.url === localPath);
+            
+            if (item && item.b2_url) {
+                sourceB2Url = item.b2_url;
+                document.getElementById('source-preview').src = imgSrc;
+                setMode('edit');
+                document.getElementById('source-image-container').classList.add('visible');
+                console.log('Using B2 URL:', sourceB2Url);
+            } else {
+                alert('Image not yet uploaded to cloud. Please wait and try again.');
+            }
+        }
+
+        async function loadGallery() {
+            try {
+                const res = await fetch('/api/gallery/pollinations');
+                galleryData = await res.json();
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = '';
+                
+                galleryData.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item';
+                    div.innerHTML = `<img src="${item.url}" alt="">`;
+                    div.onclick = () => showImage(item.url, item.b2_url);
+                    gallery.appendChild(div);
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        function showImage(url, b2_url) {
+            document.getElementById('result-img').src = url;
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('image-container').classList.add('visible');
+            
+            // Store b2_url for edit button
+            if (b2_url) {
+                sourceB2Url = b2_url;
+            }
+        }
+
+        function closeImage() {
+            document.getElementById('image-container').classList.remove('visible');
+            document.getElementById('empty-state').style.display = 'block';
+        }
+
+        loadGallery();
+
+        async function generate() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) return document.getElementById('prompt').focus();
+
+            if (currentMode === 'edit' && !sourceB2Url) {
+                alert('Please select an image to edit first! Click 🖌️ on any image.');
+                return;
+            }
+
+            const btn = document.getElementById('gen-btn');
+            const status = document.getElementById('status');
+            
+            btn.disabled = true;
+            btn.textContent = currentMode === 'edit' ? 'Editing...' : 'Generating...';
+            status.style.display = 'block';
+            status.textContent = currentMode === 'edit' ? 'Editing with cloud image...' : 'Creating...';
+
+            try {
+                let res;
+                
+                if (currentMode === 'edit') {
+                    console.log('Editing with B2 URL:', sourceB2Url);
+                    res = await fetch('/api/generate/pollinations/img2img', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            prompt,
+                            image_url: sourceB2Url,
+                            model: document.getElementById('model').value,
+                            width,
+                            height
+                        })
+                    });
+                } else {
+                    res = await fetch('/api/generate/pollinations', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            prompt,
+                            model: document.getElementById('model').value,
+                            width,
+                            height
+                        })
+                    });
+                }
+
+                const data = await res.json();
+                
+                if (data.detail) {
+                    throw new Error(data.detail);
+                }
+                
+                if (data.local_url) {
+                    showImage(data.local_url, data.b2_url);
+                    loadGallery();
+                    
+                    if (data.b2_url) {
+                        status.textContent = '✅ Saved to cloud!';
+                        status.style.color = '#10B981';
+                    }
+                } else {
+                    throw new Error('No image returned');
+                }
+            } catch(e) {
+                status.textContent = 'Error: ' + e.message;
+                status.style.color = '#e53935';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate';
+                setTimeout(() => { status.style.display = 'none'; status.style.color = '#888'; }, 3000);
+            }
+        }
+
+        function downloadImage() {
+            const url = document.getElementById('result-img').src;
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pollinations-image.png';
+            a.click();
+        }
+
+        document.addEventListener('keydown', e => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generate();
+        });
+    </script>
+</body>
+
+</html>

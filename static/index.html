@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #FAFAFA;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #E5E5E5;
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+        }
+
+        .card:hover {
+            border-color: #0066FF;
+            box-shadow: 0 4px 20px rgba(0, 102, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #111;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.5;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #F0F0F0;
+            color: #555;
+            margin-right: 0.4rem;
+        }
+
+        .card:hover .tag {
+            background: #E8F0FF;
+            color: #0066FF;
+        }
+
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .free-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #10B981;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            color: #999;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>AI Studio</h1>
+    <p class="subtitle">Select a model to generate images</p>
+
+    <div class="grid">
+        <a href="/imagen" class="card">
+            <span class="icon">🎨</span>
+            <h2>Google Imagen 4</h2>
+            <p>Photorealistic images with cinematic lighting. Best for portraits and realistic scenes.</p>
+            <div>
+                <span class="tag">Photorealistic</span>
+                <span class="tag">Cinematic</span>
+            </div>
+        </a>
+
+        <a href="/ideogram" class="card">
+            <span class="icon">✏️</span>
+            <h2>Ideogram v3</h2>
+            <p>Excellent text rendering. Best for posters, logos, and designs with typography.</p>
+            <div>
+                <span class="tag">Typography</span>
+                <span class="tag">Design</span>
+            </div>
+        </a>
+
+        <a href="/pollinations" class="card">
+            <span class="free-badge">Free</span>
+            <span class="icon">🌸</span>
+            <h2>Pollinations AI</h2>
+            <p>Free & open source. Multiple models including FLUX. No API costs.</p>
+            <div>
+                <span class="tag">Free</span>
+                <span class="tag">FLUX</span>
+            </div>
+        </a>
+    </div>
+
+    <p class="footer">Powered by Replicate & Pollinations API</p>
+
+</body>
+
+</html>
