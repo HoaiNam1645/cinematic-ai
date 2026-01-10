@@ -340,17 +340,17 @@
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="/" class="back-link">← Dashboard</a>
+            <a href="./" class="back-link">← Dashboard</a>
 
             <!-- Navigation Menu -->
             <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <a href="/pollinations"
+                <a href="pollinations"
                     style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">✨
                     Images</a>
-                <a href="/apiframe"
+                <a href="apiframe"
                     style="flex:1; padding: 0.5rem; background: linear-gradient(135deg, #8B5CF6, #6366F1); border-radius: 8px; text-decoration: none; text-align: center; color: #fff; font-size: 0.75rem;">🚀
                     Pro</a>
-                <a href="/video"
+                <a href="video"
                     style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🎬
                     Video</a>
             </div>
@@ -554,7 +554,7 @@
             try {
                 // Use existing upload endpoint, but maybe we should ensure it uploads to 'apiFrame/source'?
                 // For now standard upload is fine, we get a B2 URL back.
-                const res = await fetch('/api/upload', {
+                const res = await fetch('api/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -614,7 +614,7 @@
                     source_image: sourceB2Url // Send source image if available
                 };
 
-                const res = await fetch('/api/generate/apiframe', {
+                const res = await fetch('api/generate/apiframe', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -675,7 +675,7 @@
         // Gallery Logic
         async function loadGallery() {
             try {
-                const res = await fetch('/api/gallery/apiframe');
+                const res = await fetch('api/gallery/apiframe');
                 if (res.status !== 200) return;
                 const data = await res.json();
                 galleryData = data;
@@ -697,7 +697,7 @@
                 btn.textContent = '↻';
                 btn.disabled = true;
 
-                await fetch('/api/gallery/refresh/apiframe', { method: 'POST' });
+                await fetch('api/gallery/refresh/apiframe', { method: 'POST' });
                 await loadGallery();
 
                 btn.textContent = '↻ Refresh';

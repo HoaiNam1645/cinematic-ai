@@ -316,7 +316,7 @@
     <script>
         async function loadGallery() {
             try {
-                const res = await fetch('/api/gallery/google-imagen4');
+                const res = await fetch('api/gallery/google-imagen4');
                 const images = await res.json();
                 const gallery = document.getElementById('gallery');
                 gallery.innerHTML = '';
@@ -355,7 +355,7 @@
             status.style.display = 'block';
 
             try {
-                const res = await fetch('/api/generate/imagen', {
+                const res = await fetch('api/generate/imagen', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

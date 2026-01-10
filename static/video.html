@@ -564,7 +564,7 @@
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="/" class="back-link">← Dashboard</a>
+            <a href="./" class="back-link">← Dashboard</a>
 
             <div>
                 <h1>Video AI <span class="video-tag">VIDEO</span></h1>
@@ -764,7 +764,7 @@
             formData.append('file', file);
 
             try {
-                const response = await fetch('/api/upload', {
+                const response = await fetch('api/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -826,7 +826,7 @@
                     payload.image_url = sourceImageUrl;
                 }
 
-                const response = await fetch('/api/generate/pollinations/video', {
+                const response = await fetch('api/generate/pollinations/video', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -890,7 +890,7 @@
         // Video Gallery
         async function loadVideoGallery() {
             try {
-                const res = await fetch('/api/gallery/video');
+                const res = await fetch('api/gallery/video');
                 if (!res.ok) return;
                 const videos = await res.json();
 
@@ -913,7 +913,7 @@
 
         async function refreshGallery() {
             try {
-                await fetch('/api/gallery/refresh/video', { method: 'POST' });
+                await fetch('api/gallery/refresh/video', { method: 'POST' });
                 await loadVideoGallery();
             } catch (e) {
                 console.error('Refresh failed:', e);

@@ -557,17 +557,17 @@
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="/" class="back-link">← Dashboard</a>
+            <a href="./" class="back-link">← Dashboard</a>
 
             <!-- Navigation Menu -->
             <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <a href="/pollinations"
+                <a href="pollinations"
                     style="flex:1; padding: 0.5rem; background: #10B981; border-radius: 8px; text-decoration: none; text-align: center; color: #fff; font-size: 0.75rem;">✨
                     Images</a>
-                <a href="/apiframe"
+                <a href="apiframe"
                     style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🚀
                     Pro</a>
-                <a href="/video"
+                <a href="video"
                     style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🎬
                     Video</a>
             </div>
@@ -854,7 +854,7 @@
 
         async function loadGallery() {
             try {
-                const res = await fetch('/api/gallery/pollinations');
+                const res = await fetch('api/gallery/pollinations');
                 galleryData = await res.json();
                 const gallery = document.getElementById('gallery');
                 gallery.innerHTML = '';
@@ -904,7 +904,7 @@
                     btn.textContent = 'Optimizing...';
                     status.textContent = 'AI is crafting your prompt...';
 
-                    res = await fetch('/api/generate/pollinations/text', {
+                    res = await fetch('api/generate/pollinations/text', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -931,7 +931,7 @@
                     btn.textContent = 'Editing...';
                     status.textContent = 'Editing with cloud image...';
 
-                    res = await fetch('/api/generate/pollinations/img2img', {
+                    res = await fetch('api/generate/pollinations/img2img', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -960,7 +960,7 @@
                     status.textContent = 'Creating your image...';
 
                     const modelVal = document.getElementById('model').value;
-                    let endpoint = '/api/generate/pollinations';
+                    let endpoint = 'api/generate/pollinations';
                     const payload = {
                         prompt,
                         model: modelVal,
@@ -969,7 +969,7 @@
                     };
 
                     if (modelVal === 'ideogram') {
-                        endpoint = '/api/generate/apiframe';
+                        endpoint = 'api/generate/apiframe';
                         // APIFrame Ideogram endpoint expects { prompt, model: "ideogram" }
                         payload.model = 'ideogram';
                     }
@@ -1031,7 +1031,7 @@
             status.textContent = 'Uploading to B2...';
 
             try {
-                const res = await fetch('/api/upload', {
+                const res = await fetch('api/upload', {
                     method: 'POST',
                     body: formData
                 });
