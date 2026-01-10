@@ -1,55 +1,44 @@
+"""
+Cinematic AI - Multi Model Generator
+Main application entry point
+"""
 import os
 import time
 import uuid
-import httpx
+import asyncio
 import replicate
-import boto3
-from botocore.config import Config
-from urllib.parse import quote
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import Optional
 from dotenv import load_dotenv
-from pathlib import Path
 
 # Load environment variables
 load_dotenv()
 
+# Import routers
+from .pollinations import router as pollinations_router
+from .apiframe import router as apiframe_router
+from .shared import (
+    s3_client, 
+    b2_executor, 
+    _sync_put_object,
+    B2_FOLDER,
+    cache_omnigen,
+    cache_apiframe,
+    refresh_cache,
+    GALLERY_CACHE_TTL,
+    download_and_upload_to_b2
+)
+
+# Initialize FastAPI
 app = FastAPI(title="Cinematic AI - Multi Model Generator")
 
 # Check API Keys
 if not os.getenv("REPLICATE_API_TOKEN"):
     print("WARNING: REPLICATE_API_TOKEN is not set in .env")
-
-POLLINATIONS_API_KEY = os.getenv("POLLINATIONS_API_KEY", "")
-
-# Backblaze B2 Configuration
-B2_ACCESS_KEY_ID = os.getenv("B2_ACCESS_KEY_ID", "")
-B2_SECRET_ACCESS_KEY = os.getenv("B2_SECRET_ACCESS_KEY", "")
-B2_BUCKET = os.getenv("B2_BUCKET", "cinematic-ai")
-B2_ENDPOINT = os.getenv("B2_ENDPOINT", "https://s3.us-east-005.backblazeb2.com")
-B2_URL_CLOUD = os.getenv("B2_URL_CLOUD", "https://zipimgs.com/file/Lemiex-Fulfillment")
-B2_FOLDER = "omniGen"  # Folder for Pollinations images
-
-# Initialize B2 client
-s3_client = None
-if B2_ACCESS_KEY_ID and B2_SECRET_ACCESS_KEY:
-    try:
-        s3_client = boto3.client(
-            's3',
-            endpoint_url=B2_ENDPOINT,
-            aws_access_key_id=B2_ACCESS_KEY_ID,
-            aws_secret_access_key=B2_SECRET_ACCESS_KEY,
-            config=Config(signature_version='s3v4')
-        )
-        print(f"✅ B2 client initialized: {B2_BUCKET}/{B2_FOLDER}")
-    except Exception as e:
-        print(f"⚠️ Failed to initialize B2 client: {e}")
-else:
-    print("⚠️ B2 credentials not configured - images won't be uploaded to cloud")
 
 # CORS
 app.add_middleware(
@@ -59,73 +48,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Setup Gallery Directories
+# Include routers
+app.include_router(pollinations_router)
+app.include_router(apiframe_router)
+
+# Setup directories
 BASE_DIR = Path(__file__).parent.parent
 GALLERY_DIR = BASE_DIR / "gallery"
 UPLOADS_DIR = BASE_DIR / "uploads"
-IMAGEN_DIR = GALLERY_DIR / "google-imagen4"
-IDEOGRAM_DIR = GALLERY_DIR / "ideogramv3"
-POLLINATIONS_DIR = GALLERY_DIR / "pollinations"
+static_dir = BASE_DIR / "static"
 
-for d in [IMAGEN_DIR, IDEOGRAM_DIR, POLLINATIONS_DIR, UPLOADS_DIR]:
+for d in [GALLERY_DIR, UPLOADS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
 
-# --- Helper Functions ---
-async def upload_to_b2(file_path: Path, filename: str) -> str:
-    """Upload a file to Backblaze B2 and return public URL"""
-    if not s3_client:
-        return ""
-    
-    try:
-        key = f"{B2_FOLDER}/{filename}"
-        
-        # Upload file
-        with open(file_path, 'rb') as f:
-            s3_client.upload_fileobj(
-                f, 
-                B2_BUCKET, 
-                key,
-                ExtraArgs={'ContentType': 'image/png'}
-            )
-        
-        # Build public URL
-        public_url = f"{B2_URL_CLOUD}/{B2_FOLDER}/{filename}"
-        print(f"☁️ Uploaded to B2: {public_url}")
-        return public_url
-        
-    except Exception as e:
-        print(f"⚠️ B2 upload failed: {e}")
-        return ""
-
-
-async def save_image_locally(url: str, folder: Path, headers: dict = None) -> tuple[str, str]:
-    """Download image URL to local folder and upload to B2. Returns (local_url, b2_url)"""
-    try:
-        filename = f"{int(time.time())}_{uuid.uuid4().hex[:6]}.png"
-        filepath = folder / filename
-        
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.get(url, headers=headers or {})
-            response.raise_for_status()
-            with open(filepath, "wb") as f:
-                f.write(response.content)
-                
-        print(f"💾 Saved locally: {filepath}")
-        model_name = folder.name
-        local_url = f"/gallery/{model_name}/{filename}"
-        
-        # Upload to B2
-        b2_url = await upload_to_b2(filepath, filename)
-        
-        return local_url, b2_url
-        
-    except Exception as e:
-        print(f"⚠️ Failed to save: {e}")
-        return url, ""
-
-
-# --- Request Models ---
+# --- Request Models for legacy endpoints ---
 class ImagenRequest(BaseModel):
     prompt: str
     aspect_ratio: str = "16:9"
@@ -136,98 +73,67 @@ class IdeogramRequest(BaseModel):
     style_type: str = "None"
     magic_prompt_option: str = "Auto"
 
-class PollinationsRequest(BaseModel):
-    prompt: str
-    model: str = "flux"
-    width: int = 1024
-    height: int = 1024
 
-class PollinationsImg2ImgRequest(BaseModel):
-    prompt: str
-    image_url: str  # B2 public URL of source image
-    model: str = "kontext"
-    width: int = 1024
-    height: int = 1024
-    strength: float = 0.7
-
-# --- Quality Assurance System Prompts ---
+# Quality boosters
 IMAGEN_QUALITY_BOOSTER = ", stunning quality, highly detailed, 8k resolution, sharp focus, professional image, cinematic lighting"
 IDEOGRAM_QUALITY_BOOSTER = ", high quality, aesthetic, masterpiece, professional design"
 
-POLLINATIONS_QUALITY_BOOSTER = (
-    ", masterpiece, best quality, ultra detailed, 8K UHD resolution, "
-    "professional photography, sharp focus, intricate details, "
-    "cinematic lighting, soft natural bokeh, high dynamic range, "
-    "photorealistic, award-winning, trending on artstation"
-)
-
-POLLINATIONS_API_BASE = "https://gen.pollinations.ai"
-
 
 # --- Upload Endpoint ---
-
 @app.post("/api/upload")
 async def upload_image(file: UploadFile = File(...)):
-    """Upload an image to local storage and B2"""
+    """Upload image directly to B2"""
     try:
-        ext = file.filename.split('.')[-1] if '.' in file.filename else 'png'
-        filename = f"{int(time.time())}_{uuid.uuid4().hex[:6]}.{ext}"
-        filepath = UPLOADS_DIR / filename
-        
         content = await file.read()
-        with open(filepath, "wb") as f:
-            f.write(content)
         
-        print(f"📤 Uploaded: {filepath}")
+        filename = f"{int(time.time())}_{uuid.uuid4().hex[:6]}.png"
+        key = f"{B2_FOLDER}/{filename}"
         
-        # Also upload to B2
-        b2_url = await upload_to_b2(filepath, filename)
+        loop = asyncio.get_event_loop()
+        b2_url = await asyncio.wait_for(
+            loop.run_in_executor(b2_executor, _sync_put_object, content, key),
+            timeout=60.0
+        )
         
-        return {
-            "url": f"/uploads/{filename}", 
-            "filename": filename,
-            "b2_url": b2_url
-        }
+        if b2_url:
+            cache_omnigen["data"].insert(0, {
+                "url": b2_url,
+                "b2_url": b2_url,
+                "time": time.time()
+            })
+            
+        print(f"Uploaded to B2: {b2_url}")
+        
+        return {"url": b2_url, "b2_url": b2_url}
     
     except Exception as e:
-        print(f"❌ Upload error: {e}")
+        print(f"Upload error: {e}")
         raise HTTPException(500, str(e))
 
 
-# --- Gallery Routes ---
-
+# --- Legacy Gallery Endpoint ---
 @app.get("/api/gallery/{model_type}")
-async def get_gallery(model_type: str):
-    """Get list of files for a specific model"""
-    valid_types = ["google-imagen4", "ideogramv3", "pollinations"]
-    if model_type not in valid_types:
-        raise HTTPException(400, f"Invalid model type. Must be one of: {valid_types}")
-    
-    target_dir = GALLERY_DIR / model_type
-    if not target_dir.exists():
-        return []
-    
-    files = []
-    for f in target_dir.glob("*.png"):
-        # Build B2 URL for each file
-        b2_url = f"{B2_URL_CLOUD}/{B2_FOLDER}/{f.name}" if B2_URL_CLOUD else ""
-        files.append({
-            "url": f"/gallery/{model_type}/{f.name}",
-            "b2_url": b2_url,
-            "time": f.stat().st_mtime
-        })
-    
-    files.sort(key=lambda x: x["time"], reverse=True)
-    return files
+async def get_gallery_legacy(model_type: str):
+    """Legacy gallery endpoint for compatibility"""
+    if model_type == "pollinations":
+        now = time.time()
+        if cache_omnigen["data"] and (now - cache_omnigen["timestamp"]) < GALLERY_CACHE_TTL:
+            return cache_omnigen["data"]
+        return await refresh_cache("omnigen")
+    elif model_type == "apiframe":
+        now = time.time()
+        if cache_apiframe["data"] and (now - cache_apiframe["timestamp"]) < GALLERY_CACHE_TTL:
+            return cache_apiframe["data"]
+        return await refresh_cache("apiframe")
+    return []
 
 
-# --- Image Generation Routes ---
-
+# --- Replicate Endpoints (Imagen, Ideogram via Replicate) ---
 @app.post("/api/generate/imagen")
 async def generate_imagen(request: ImagenRequest):
     """Generate using Google Imagen 4"""
     try:
-        print(f"🎨 [Imagen 4] User Prompt: {request.prompt[:50]}...")
+        print(f"[Imagen 4] User Prompt: {request.prompt[:50]}...")
         
         final_prompt = f"{request.prompt}{IMAGEN_QUALITY_BOOSTER}"
         
@@ -241,14 +147,14 @@ async def generate_imagen(request: ImagenRequest):
         )
         
         image_url = str(output[0]) if isinstance(output, list) else str(output)
-        print(f"✅ Generated: {image_url}")
+        print(f"Generated: {image_url}")
         
-        local_url, b2_url = await save_image_locally(image_url, folder=IMAGEN_DIR)
+        b2_url = await download_and_upload_to_b2(image_url)
         
-        return {"url": image_url, "local_url": local_url, "b2_url": b2_url}
+        return {"url": image_url, "b2_url": b2_url}
 
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f"Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -256,7 +162,7 @@ async def generate_imagen(request: ImagenRequest):
 async def generate_ideogram(request: IdeogramRequest):
     """Generate using Ideogram v3"""
     try:
-        print(f"🎨 [Ideogram v3] User Prompt: {request.prompt[:50]}...")
+        print(f"[Ideogram v3] User Prompt: {request.prompt[:50]}...")
 
         final_prompt = f"{request.prompt}{IDEOGRAM_QUALITY_BOOSTER}"
 
@@ -272,131 +178,36 @@ async def generate_ideogram(request: IdeogramRequest):
         )
         
         image_url = str(output)
-        print(f"✅ Generated: {image_url}")
+        print(f"Generated: {image_url}")
         
-        local_url, b2_url = await save_image_locally(image_url, folder=IDEOGRAM_DIR)
+        b2_url = await download_and_upload_to_b2(image_url)
         
-        return {"url": image_url, "local_url": local_url, "b2_url": b2_url}
+        return {"url": image_url, "b2_url": b2_url}
 
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f"Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --- Pollinations AI (FREE) ---
-
-@app.get("/api/pollinations/models")
-async def get_pollinations_models():
-    """Get available Pollinations models"""
-    return {
-        "text2img": ["flux", "turbo", "zimage", "seedream", "gptimage"],
-        "img2img": ["kontext", "gptimage"]
-    }
-
-
-@app.post("/api/generate/pollinations")
-async def generate_pollinations(request: PollinationsRequest):
-    """Generate image using Pollinations AI (FREE)"""
-    try:
-        print(f"🌸 [Pollinations T2I] User Prompt: {request.prompt[:50]}...")
-        print(f"   Model: {request.model}, Size: {request.width}x{request.height}")
-
-        final_prompt = f"{request.prompt}{POLLINATIONS_QUALITY_BOOSTER}"
-        encoded_prompt = quote(final_prompt)
-        
-        image_url = (
-            f"{POLLINATIONS_API_BASE}/image/{encoded_prompt}"
-            f"?model={request.model}"
-            f"&width={request.width}"
-            f"&height={request.height}"
-            f"&seed={int(time.time())}"
-            f"&enhance=true"
-            f"&nologo=true"
-        )
-        
-        if POLLINATIONS_API_KEY:
-            image_url += f"&key={POLLINATIONS_API_KEY}"
-        
-        print(f"🔗 Pollinations URL: {image_url[:100]}...")
-        
-        headers = {}
-        if POLLINATIONS_API_KEY:
-            headers["Authorization"] = f"Bearer {POLLINATIONS_API_KEY}"
-        
-        local_url, b2_url = await save_image_locally(image_url, folder=POLLINATIONS_DIR, headers=headers)
-        
-        print(f"✅ Generated: local={local_url}, b2={b2_url}")
-        
-        return {"url": image_url, "local_url": local_url, "b2_url": b2_url}
-
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/api/generate/pollinations/img2img")
-async def generate_pollinations_img2img(request: PollinationsImg2ImgRequest):
-    """Edit image using Pollinations AI - requires B2 public URL"""
-    try:
-        print(f"🖌️ [Pollinations I2I] Prompt: {request.prompt[:50]}...")
-        print(f"   Source: {request.image_url[:80]}...")
-        print(f"   Model: {request.model}")
-
-        # Use the B2 URL directly (should be public)
-        if not request.image_url.startswith("http"):
-            raise HTTPException(400, "Image URL must be a public URL (B2)")
-
-        edit_prompt = f"{request.prompt}, preserve original composition and style"
-        encoded_prompt = quote(edit_prompt)
-        encoded_source = quote(request.image_url, safe='')
-        
-        image_url = (
-            f"{POLLINATIONS_API_BASE}/image/{encoded_prompt}"
-            f"?model={request.model}"
-            f"&image={encoded_source}"
-            f"&seed={int(time.time())}"
-            f"&nologo=true"
-        )
-        
-        if POLLINATIONS_API_KEY:
-            image_url += f"&key={POLLINATIONS_API_KEY}"
-        
-        print(f"🔗 Pollinations I2I URL: {image_url[:150]}...")
-        
-        headers = {}
-        if POLLINATIONS_API_KEY:
-            headers["Authorization"] = f"Bearer {POLLINATIONS_API_KEY}"
-        
-        local_url, b2_url = await save_image_locally(image_url, folder=POLLINATIONS_DIR, headers=headers)
-        
-        print(f"✅ Edited: local={local_url}, b2={b2_url}")
-        
-        return {"url": image_url, "local_url": local_url, "b2_url": b2_url}
-
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# --- Static Files Handling ---
-static_dir = BASE_DIR / "static"
-
+# --- Static Files ---
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 app.mount("/gallery", StaticFiles(directory=str(GALLERY_DIR)), name="gallery")
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
+
+# --- Page Routes ---
 @app.get("/")
 async def root():
-    return FileResponse(str(static_dir / "index.html"))
-
-@app.get("/imagen")
-async def page_imagen():
-    return FileResponse(str(static_dir / "imagen.html"))
-
-@app.get("/ideogram")
-async def page_ideogram():
-    return FileResponse(str(static_dir / "ideogram.html"))
+    return FileResponse(static_dir / "index.html")
 
 @app.get("/pollinations")
 async def page_pollinations():
-    return FileResponse(str(static_dir / "pollinations.html"))
+    return FileResponse(static_dir / "pollinations.html")
+
+@app.get("/apiframe")
+async def page_apiframe():
+    return FileResponse(static_dir / "apiframe.html")
+
+@app.get("/video")
+async def page_video():
+    return FileResponse(static_dir / "video.html")

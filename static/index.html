@@ -4,162 +4,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Cinematic AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #FAFAFA;
-            color: #1a1a1a;
-            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            background: #0F172A;
+            color: #F8FAFC;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            padding: 40px;
+            text-align: center;
         }
 
         h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 0.5rem;
+            font-size: 48px;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #60A5FA, #A78BFA, #F472B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .subtitle {
-            color: #666;
-            font-size: 1rem;
-            margin-bottom: 3rem;
+        p.subtitle {
+            color: #94A3B8;
+            font-size: 18px;
+            margin-bottom: 60px;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
-            max-width: 900px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
 
         .card {
-            background: #fff;
-            border: 1px solid #E5E5E5;
-            border-radius: 16px;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            background: #1E293B;
+            border: 1px solid #334155;
+            border-radius: 24px;
+            padding: 32px;
             text-decoration: none;
             color: inherit;
+            transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
+            text-align: left;
         }
 
         .card:hover {
-            border-color: #0066FF;
-            box-shadow: 0 4px 20px rgba(0, 102, 255, 0.1);
-            transform: translateY(-2px);
+            transform: translateY(-8px);
+            border-color: #6366F1;
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3);
         }
 
         .card h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #111;
+            margin: 0 0 12px;
+            font-size: 24px;
         }
 
         .card p {
-            color: #666;
-            line-height: 1.5;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            background: #F0F0F0;
-            color: #555;
-            margin-right: 0.4rem;
-        }
-
-        .card:hover .tag {
-            background: #E8F0FF;
-            color: #0066FF;
+            color: #94A3B8;
+            margin: 0;
+            line-height: 1.6;
         }
 
         .icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            display: block;
+            font-size: 48px;
+            margin-bottom: 24px;
         }
 
-        .free-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: #10B981;
+        /* Specific Styles */
+        .card.pollinations .badge {
+            background: #22C55E;
+            color: #000;
+        }
+
+        .card.apiframe .badge {
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
             color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
         }
 
-        .footer {
-            margin-top: 3rem;
-            color: #999;
-            font-size: 0.8rem;
+        .badge {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>AI Studio</h1>
-    <p class="subtitle">Select a model to generate images</p>
+    <div class="container">
+        <h1>Cinematic AI Studio</h1>
+        <p class="subtitle">Select your creative tool</p>
 
-    <div class="grid">
-        <a href="/imagen" class="card">
-            <span class="icon">🎨</span>
-            <h2>Google Imagen 4</h2>
-            <p>Photorealistic images with cinematic lighting. Best for portraits and realistic scenes.</p>
-            <div>
-                <span class="tag">Photorealistic</span>
-                <span class="tag">Cinematic</span>
-            </div>
-        </a>
+        <div class="grid">
+            <a href="/pollinations" class="card pollinations">
+                <span class="badge">Free</span>
+                <div class="icon">✨</div>
+                <h2>Pollinations AI</h2>
+                <p>Generate amazing images using Flux and Turbo models. Unlimited, fast, and completely free.</p>
+            </a>
 
-        <a href="/ideogram" class="card">
-            <span class="icon">✏️</span>
-            <h2>Ideogram v3</h2>
-            <p>Excellent text rendering. Best for posters, logos, and designs with typography.</p>
-            <div>
-                <span class="tag">Typography</span>
-                <span class="tag">Design</span>
-            </div>
-        </a>
+            <a href="/apiframe" class="card apiframe">
+                <span class="badge">Pro</span>
+                <div class="icon">🚀</div>
+                <h2>APIFrame Pro</h2>
+                <p>Access premium models like Ideogram and Midjourney. Typography support, high fidelity.</p>
+            </a>
 
-        <a href="/pollinations" class="card">
-            <span class="free-badge">Free</span>
-            <span class="icon">🌸</span>
-            <h2>Pollinations AI</h2>
-            <p>Free & open source. Multiple models including FLUX. No API costs.</p>
-            <div>
-                <span class="tag">Free</span>
-                <span class="tag">FLUX</span>
-            </div>
-        </a>
+            <a href="/video" class="card video">
+                <span class="badge"
+                    style="background: linear-gradient(135deg, #E040FB, #7C4DFF); color: white;">Video</span>
+                <div class="icon">🎬</div>
+                <h2>Video AI</h2>
+                <p>Create cinematic AI videos with Veo and Seedance. Text-to-video and image-to-video generation.</p>
+            </a>
+        </div>
     </div>
-
-    <p class="footer">Powered by Replicate & Pollinations API</p>
 
 </body>
 

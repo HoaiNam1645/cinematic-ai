@@ -92,10 +92,10 @@
 
         .mode-btn {
             flex: 1;
-            padding: 0.5rem 0.8rem;
+            padding: 0.5rem 0.6rem;
             border: none;
             background: transparent;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #666;
             cursor: pointer;
@@ -118,8 +118,9 @@
             font-family: inherit;
             font-size: 0.9rem;
             line-height: 1.5;
-            resize: none;
-            height: 80px;
+            resize: vertical;
+            min-height: 100px;
+            max-height: 400px;
             color: #333;
         }
 
@@ -127,6 +128,10 @@
             outline: none;
             border-color: #10B981;
             background: #fff;
+        }
+
+        textarea.tall {
+            height: 120px;
         }
 
         .source-image {
@@ -154,6 +159,60 @@
             color: #888;
             text-align: center;
             margin-top: 0.3rem;
+        }
+
+        /* Optimized Prompt Output */
+        .optimized-output {
+            background: #F0FDF4;
+            border: 1px solid #D1FAE5;
+            border-radius: 10px;
+            padding: 0.7rem;
+            font-size: 0.85rem;
+            color: #065F46;
+            display: none;
+            position: relative;
+        }
+
+        .optimized-output.visible {
+            display: block;
+        }
+
+        .optimized-output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+
+        .optimized-output-header span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #059669;
+            text-transform: uppercase;
+        }
+
+        .optimized-output-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .optimized-output-actions button {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .optimized-output-actions button:hover {
+            background: #059669;
+        }
+
+        .optimized-output p {
+            margin: 0;
+            line-height: 1.4;
         }
 
         .presets {
@@ -224,6 +283,14 @@
             cursor: not-allowed;
         }
 
+        .btn-generate.purple {
+            background: #8B5CF6;
+        }
+
+        .btn-generate.purple:hover {
+            background: #7C3AED;
+        }
+
         .status {
             font-size: 0.8rem;
             color: #888;
@@ -232,42 +299,50 @@
         }
 
         .main {
+            flex: 1;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            background: #F3F4F6;
+            height: 100vh;
+            overflow: hidden;
             position: relative;
-            background: #F5F5F5;
         }
 
         .empty-state {
             text-align: center;
-            color: #999;
-        }
-
-        .empty-state svg {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 1rem;
-            opacity: 0.3;
+            color: #9CA3AF;
+            margin-top: auto;
+            margin-bottom: auto;
         }
 
         .image-container {
             display: none;
-            max-width: 100%;
-            max-height: calc(100vh - 150px);
+            flex: 1;
+            width: 100%;
+            min-height: 0;
+            max-width: 1024px;
             position: relative;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 0px;
+            align-items: center;
+            justify-content: center;
+            max-height: calc(100vh - 180px);
         }
 
         .image-container.visible {
-            display: block;
+            display: flex;
         }
 
         .image-container img {
             max-width: 100%;
-            max-height: calc(100vh - 150px);
-            border-radius: 12px;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
@@ -312,29 +387,154 @@
             overflow-x: auto;
         }
 
-        .gallery:empty {
+        .gallery::-webkit-scrollbar {
             display: none;
         }
 
         .gallery-item {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid transparent;
-            flex-shrink: 0;
-            position: relative;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .gallery-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item.active {
             border-color: #10B981;
+            transform: scale(1.05);
+        }
+
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #E5E5E5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .gallery-nav-btn:hover {
+            background: #10B981;
+            color: white;
+            border-color: #10B981;
+        }
+
+        .gallery-nav-btn.prev {
+            left: 8px;
+        }
+
+        .gallery-nav-btn.next {
+            right: 8px;
         }
 
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        /* Carousel Styles */
+        .gallery-wrapper {
+            position: relative;
+            background: #F8F9FA;
+            border-top: 1px solid #E5E5E5;
+            padding: 16px 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-top: auto;
+            /* Push to bottom of main if flex */
+        }
+
+        .gallery {
+            display: flex;
+            gap: 12px;
+            padding: 0 50px;
+            /* Space for buttons */
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            width: 100%;
+        }
+
+        .gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-item {
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item.active {
+            border-color: #10B981;
+            transform: scale(1.05);
+        }
+
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #E5E5E5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .gallery-nav-btn:hover {
+            background: #10B981;
+            color: white;
+            border-color: #10B981;
+        }
+
+        .gallery-nav-btn.prev {
+            left: 8px;
+        }
+
+        .gallery-nav-btn.next {
+            right: 8px;
         }
 
         @media (max-width: 800px) {
@@ -357,7 +557,20 @@
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="/" class="back-link">← Back</a>
+            <a href="/" class="back-link">← Dashboard</a>
+
+            <!-- Navigation Menu -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <a href="/pollinations"
+                    style="flex:1; padding: 0.5rem; background: #10B981; border-radius: 8px; text-decoration: none; text-align: center; color: #fff; font-size: 0.75rem;">✨
+                    Images</a>
+                <a href="/apiframe"
+                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🚀
+                    Pro</a>
+                <a href="/video"
+                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🎬
+                    Video</a>
+            </div>
 
             <div>
                 <h1>Pollinations AI <span class="free-tag">FREE</span></h1>
@@ -370,6 +583,7 @@
                 <div class="mode-toggle">
                     <button class="mode-btn active" onclick="setMode('create')" id="mode-create">✨ Create</button>
                     <button class="mode-btn" onclick="setMode('edit')" id="mode-edit">🖌️ Edit</button>
+                    <button class="mode-btn" onclick="setMode('text')" id="mode-text">📝 Prompt</button>
                 </div>
             </div>
 
@@ -390,7 +604,19 @@
                 </div>
             </div>
 
-            <div>
+            <!-- Optimized Prompt Output (for Text mode) -->
+            <div class="optimized-output" id="optimized-output">
+                <div class="optimized-output-header">
+                    <span>✨ Optimized Prompt</span>
+                    <div class="optimized-output-actions">
+                        <button onclick="copyOptimized()">📋 Copy</button>
+                        <button onclick="useOptimized()">🎨 Use</button>
+                    </div>
+                </div>
+                <p id="optimized-text"></p>
+            </div>
+
+            <div id="settings-container">
                 <label>Model & Size</label>
                 <div class="row-2">
                     <select id="model">
@@ -408,6 +634,10 @@
 
             <button class="btn-generate" id="gen-btn" onclick="generate()">Generate</button>
             <p class="status" id="status">Generating...</p>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="file-upload" accept="image/*" style="display: none;"
+                onchange="handleFileUpload(this)">
         </aside>
 
         <main class="main">
@@ -428,15 +658,20 @@
                 </div>
             </div>
 
-            <div class="gallery" id="gallery"></div>
+            <div class="gallery-wrapper">
+                <button class="gallery-nav-btn prev" onclick="scrollGallery(-1)">❮</button>
+                <div class="gallery" id="gallery"></div>
+                <button class="gallery-nav-btn next" onclick="scrollGallery(1)">❯</button>
+            </div>
         </main>
     </div>
 
     <script>
         let currentMode = 'create';
-        let sourceB2Url = null;  // B2 public URL for editing
+        let sourceB2Url = null;
         let width = 1024, height = 1024;
-        let galleryData = [];  // Store gallery with b2_url
+        let galleryData = [];
+        let lastOptimizedPrompt = '';
 
         const presets = {
             portrait: "Professional portrait, soft lighting, shallow depth of field",
@@ -452,56 +687,93 @@
             remove: "remove the watermark and text"
         };
 
+        const textPresets = {
+            simple: "a cat sitting on a window",
+            scene: "cyberpunk city at night with neon lights",
+            product: "premium headphones on marble surface",
+            portrait: "young woman with flowers in her hair"
+        };
+
         function setMode(mode) {
             currentMode = mode;
             const createBtn = document.getElementById('mode-create');
             const editBtn = document.getElementById('mode-edit');
+            const textBtn = document.getElementById('mode-text');
             const sourceContainer = document.getElementById('source-image-container');
             const presetsDiv = document.getElementById('presets');
             const promptLabel = document.getElementById('prompt-label');
             const modelSelect = document.getElementById('model');
             const prompt = document.getElementById('prompt');
+            const genBtn = document.getElementById('gen-btn');
+            const settingsContainer = document.getElementById('settings-container');
+            const optimizedOutput = document.getElementById('optimized-output');
+
+            // Reset all active states
+            createBtn.classList.remove('active');
+            editBtn.classList.remove('active');
+            textBtn.classList.remove('active');
+            sourceContainer.classList.remove('visible');
+            optimizedOutput.classList.remove('visible');
+            genBtn.classList.remove('purple');
+            settingsContainer.style.display = 'block';
 
             if (mode === 'create') {
                 createBtn.classList.add('active');
-                editBtn.classList.remove('active');
-                sourceContainer.classList.remove('visible');
                 promptLabel.textContent = 'Prompt';
                 prompt.placeholder = 'Describe your image...';
-                
+                prompt.classList.remove('tall');
+                genBtn.textContent = 'Generate';
+
                 presetsDiv.innerHTML = `
                     <button class="preset-btn" onclick="usePreset('portrait')">Portrait</button>
                     <button class="preset-btn" onclick="usePreset('landscape')">Landscape</button>
                     <button class="preset-btn" onclick="usePreset('fantasy')">Fantasy</button>
                     <button class="preset-btn" onclick="usePreset('anime')">Anime</button>
                 `;
-                
+
                 modelSelect.innerHTML = `
                     <option value="flux">FLUX (Best)</option>
                     <option value="turbo">Turbo (Fast)</option>
                     <option value="zimage">Z-Image</option>
+                    <option value="ideogram">Ideogram (Pro)</option>
                 `;
-            } else {
-                createBtn.classList.remove('active');
+            } else if (mode === 'edit') {
                 editBtn.classList.add('active');
                 promptLabel.textContent = 'What to change';
                 prompt.placeholder = 'Describe what you want to change...';
-                
+                prompt.classList.remove('tall');
+                genBtn.textContent = 'Edit Image';
+
                 presetsDiv.innerHTML = `
+                    <button class="preset-btn" onclick="document.getElementById('file-upload').click()">📁 Upload</button>
                     <button class="preset-btn" onclick="useEditPreset('style')">🎨 Style</button>
                     <button class="preset-btn" onclick="useEditPreset('lighting')">💡 Light</button>
                     <button class="preset-btn" onclick="useEditPreset('background')">🌅 BG</button>
                     <button class="preset-btn" onclick="useEditPreset('remove')">🗑️ Remove</button>
                 `;
-                
+
                 modelSelect.innerHTML = `
                     <option value="kontext">Kontext (Edit)</option>
                 `;
 
-                // Show source if available
                 if (sourceB2Url) {
                     sourceContainer.classList.add('visible');
                 }
+            } else if (mode === 'text') {
+                textBtn.classList.add('active');
+                promptLabel.textContent = 'Your idea (simple is fine)';
+                prompt.placeholder = 'Describe what you want in simple words...\nExample: "a cat in garden" or "futuristic city"';
+                prompt.classList.add('tall');
+                genBtn.textContent = 'Optimize Prompt';
+                genBtn.classList.add('purple');
+                settingsContainer.style.display = 'none';
+
+                presetsDiv.innerHTML = `
+                    <button class="preset-btn" onclick="useTextPreset('simple')">🐱 Cat</button>
+                    <button class="preset-btn" onclick="useTextPreset('scene')">🌃 Cyberpunk</button>
+                    <button class="preset-btn" onclick="useTextPreset('product')">🎧 Product</button>
+                    <button class="preset-btn" onclick="useTextPreset('portrait')">👩 Portrait</button>
+                `;
             }
         }
 
@@ -513,55 +785,63 @@
             document.getElementById('prompt').value = editPresets[key];
         }
 
+        function useTextPreset(key) {
+            document.getElementById('prompt').value = textPresets[key];
+        }
+
         function setRes() {
             const [w, h] = document.getElementById('resolution').value.split('x');
             width = parseInt(w);
             height = parseInt(h);
         }
 
-        // Use generated image as source for editing
         function useAsSource() {
             const imgSrc = document.getElementById('result-img').src;
             if (!imgSrc) return;
-            
-            // Find the B2 URL for this image from gallery data
-            const localPath = imgSrc.replace(window.location.origin, '');
-            const item = galleryData.find(g => g.url === localPath);
-            
+
+            // Find item by b2_url since we now use B2 URLs directly
+            const item = galleryData.find(g => g.url === imgSrc || g.b2_url === imgSrc);
+
             if (item && item.b2_url) {
                 sourceB2Url = item.b2_url;
                 document.getElementById('source-preview').src = imgSrc;
                 setMode('edit');
                 document.getElementById('source-image-container').classList.add('visible');
-                console.log('Using B2 URL:', sourceB2Url);
             } else {
-                alert('Image not yet uploaded to cloud. Please wait and try again.');
+                // If showing directly from API response, use img src as B2 URL
+                if (imgSrc.startsWith('https://')) {
+                    sourceB2Url = imgSrc;
+                    document.getElementById('source-preview').src = imgSrc;
+                    setMode('edit');
+                    document.getElementById('source-image-container').classList.add('visible');
+                } else {
+                    alert('Image not available for editing');
+                }
             }
         }
 
-        async function loadGallery() {
-            try {
-                const res = await fetch('/api/gallery/pollinations');
-                galleryData = await res.json();
-                const gallery = document.getElementById('gallery');
-                gallery.innerHTML = '';
-                
-                galleryData.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'gallery-item';
-                    div.innerHTML = `<img src="${item.url}" alt="">`;
-                    div.onclick = () => showImage(item.url, item.b2_url);
-                    gallery.appendChild(div);
-                });
-            } catch(e) { console.error(e); }
+        function copyOptimized() {
+            navigator.clipboard.writeText(lastOptimizedPrompt);
+            alert('Copied to clipboard!');
+        }
+
+        function useOptimized() {
+            if (!lastOptimizedPrompt) return;
+            document.getElementById('prompt').value = lastOptimizedPrompt;
+            setMode('create');
+        }
+
+        function scrollGallery(direction) {
+            const gallery = document.getElementById('gallery');
+            const scrollAmount = gallery.clientWidth * 0.8;
+            gallery.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
         }
 
         function showImage(url, b2_url) {
             document.getElementById('result-img').src = url;
             document.getElementById('empty-state').style.display = 'none';
             document.getElementById('image-container').classList.add('visible');
-            
-            // Store b2_url for edit button
+
             if (b2_url) {
                 sourceB2Url = b2_url;
             }
@@ -570,6 +850,33 @@
         function closeImage() {
             document.getElementById('image-container').classList.remove('visible');
             document.getElementById('empty-state').style.display = 'block';
+        }
+
+        async function loadGallery() {
+            try {
+                const res = await fetch('/api/gallery/pollinations');
+                galleryData = await res.json();
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = '';
+
+                if (galleryData.length === 0) {
+                    gallery.innerHTML = '<div style="padding: 20px; color: #999; width: 100%; text-align: center;">No images yet</div>';
+                    return;
+                }
+
+                galleryData.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item';
+                    div.innerHTML = `<img src="${item.url}" alt="" loading="lazy">`;
+                    div.onclick = () => {
+                        showImage(item.url, item.b2_url);
+                        // Highlight active
+                        document.querySelectorAll('.gallery-item').forEach(el => el.classList.remove('active'));
+                        div.classList.add('active');
+                    };
+                    gallery.appendChild(div);
+                });
+            } catch (e) { console.error(e); }
         }
 
         loadGallery();
@@ -585,20 +892,48 @@
 
             const btn = document.getElementById('gen-btn');
             const status = document.getElementById('status');
-            
+
             btn.disabled = true;
-            btn.textContent = currentMode === 'edit' ? 'Editing...' : 'Generating...';
             status.style.display = 'block';
-            status.textContent = currentMode === 'edit' ? 'Editing with cloud image...' : 'Creating...';
 
             try {
                 let res;
-                
-                if (currentMode === 'edit') {
-                    console.log('Editing with B2 URL:', sourceB2Url);
+
+                if (currentMode === 'text') {
+                    // Text mode - optimize prompt
+                    btn.textContent = 'Optimizing...';
+                    status.textContent = 'AI is crafting your prompt...';
+
+                    res = await fetch('/api/generate/pollinations/text', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt,
+                            model: 'openai'
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.detail) {
+                        throw new Error(data.detail);
+                    }
+
+                    if (data.optimized_prompt) {
+                        lastOptimizedPrompt = data.optimized_prompt;
+                        document.getElementById('optimized-text').textContent = lastOptimizedPrompt;
+                        document.getElementById('optimized-output').classList.add('visible');
+                        status.textContent = '✨ Prompt optimized!';
+                        status.style.color = '#8B5CF6';
+                    }
+
+                } else if (currentMode === 'edit') {
+                    btn.textContent = 'Editing...';
+                    status.textContent = 'Editing with cloud image...';
+
                     res = await fetch('/api/generate/pollinations/img2img', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             prompt,
                             image_url: sourceB2Url,
@@ -607,42 +942,68 @@
                             height
                         })
                     });
+
+                    const data = await res.json();
+                    if (data.detail) throw new Error(data.detail);
+                    if (data.b2_url) {
+                        showImage(data.b2_url, data.b2_url);
+                        loadGallery();
+                        status.textContent = 'Saved to cloud!';
+                        status.style.color = '#10B981';
+                    } else {
+                        throw new Error('Failed to upload to cloud');
+                    }
+
                 } else {
-                    res = await fetch('/api/generate/pollinations', {
+                    // Create mode
+                    btn.textContent = 'Generating...';
+                    status.textContent = 'Creating your image...';
+
+                    const modelVal = document.getElementById('model').value;
+                    let endpoint = '/api/generate/pollinations';
+                    const payload = {
+                        prompt,
+                        model: modelVal,
+                        width,
+                        height
+                    };
+
+                    if (modelVal === 'ideogram') {
+                        endpoint = '/api/generate/apiframe';
+                        // APIFrame Ideogram endpoint expects { prompt, model: "ideogram" }
+                        payload.model = 'ideogram';
+                    }
+
+                    res = await fetch(endpoint, {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            prompt,
-                            model: document.getElementById('model').value,
-                            width,
-                            height
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
                     });
+
+                    const data = await res.json();
+                    if (data.detail) throw new Error(data.detail);
+                    if (data.b2_url) {
+                        showImage(data.b2_url, data.b2_url);
+                        loadGallery();
+                        status.textContent = 'Saved to cloud!';
+                        status.style.color = '#10B981';
+                    } else {
+                        throw new Error('Failed to upload to cloud');
+                    }
                 }
 
-                const data = await res.json();
-                
-                if (data.detail) {
-                    throw new Error(data.detail);
-                }
-                
-                if (data.local_url) {
-                    showImage(data.local_url, data.b2_url);
-                    loadGallery();
-                    
-                    if (data.b2_url) {
-                        status.textContent = '✅ Saved to cloud!';
-                        status.style.color = '#10B981';
-                    }
-                } else {
-                    throw new Error('No image returned');
-                }
-            } catch(e) {
+            } catch (e) {
                 status.textContent = 'Error: ' + e.message;
                 status.style.color = '#e53935';
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Generate';
+                if (currentMode === 'text') {
+                    btn.textContent = 'Optimize Prompt';
+                } else if (currentMode === 'edit') {
+                    btn.textContent = 'Edit Image';
+                } else {
+                    btn.textContent = 'Generate';
+                }
                 setTimeout(() => { status.style.display = 'none'; status.style.color = '#888'; }, 3000);
             }
         }
@@ -653,6 +1014,58 @@
             a.href = url;
             a.download = 'pollinations-image.png';
             a.click();
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Debug alert
+            // alert("Uploading " + file.name + "...");
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.textContent = 'Uploading to B2...';
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.b2_url) {
+                    // Clearly update source
+                    sourceB2Url = data.b2_url;
+
+                    const sourcePreview = document.getElementById('source-preview');
+                    sourcePreview.src = data.b2_url;
+                    document.getElementById('source-image-container').classList.add('visible');
+
+                    // Show in main area too
+                    showImage(data.b2_url, data.b2_url);
+
+                    // Refresh gallery
+                    loadGallery();
+
+                    status.textContent = 'Upload successful!';
+                    status.style.color = '#10B981';
+
+                    // console.log("Set source to:", data.b2_url);
+                } else {
+                    throw new Error('No B2 URL returned');
+                }
+            } catch (e) {
+                alert('Upload failed: ' + e.message);
+                status.textContent = 'Upload failed';
+                status.style.color = '#e53935';
+            } finally {
+                input.value = ''; // Reset input
+                setTimeout(() => { status.style.display = 'none'; status.style.color = '#888'; }, 3000);
+            }
         }
 
         document.addEventListener('keydown', e => {

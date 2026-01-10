@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video AI - Cinematic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FAFAFA;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: #fff;
+            border-right: 1px solid #E5E5E5;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #E040FB;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .video-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #E040FB, #7C4DFF);
+            color: #fff;
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: #F0F0F0;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.5rem 0.6rem;
+            border: none;
+            background: transparent;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+
+        .mode-btn.active {
+            background: #fff;
+            color: #111;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            background: #FAFAFA;
+            border: 1px solid #E0E0E0;
+            border-radius: 10px;
+            padding: 0.7rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 100px;
+            max-height: 300px;
+            color: #333;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #E040FB;
+            background: #fff;
+        }
+
+        select {
+            width: 100%;
+            background: #FAFAFA;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 0.6rem;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #E040FB;
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-container input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #E0E0E0;
+        }
+
+        .range-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E040FB, #7C4DFF);
+            cursor: pointer;
+        }
+
+        .range-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+            color: #E040FB;
+        }
+
+        .aspect-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .aspect-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #E0E0E0;
+            background: #FAFAFA;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .aspect-btn.active {
+            border-color: #E040FB;
+            background: #FAE8FF;
+            color: #E040FB;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .toggle-label {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: #E0E0E0;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle.active {
+            background: linear-gradient(135deg, #E040FB, #7C4DFF);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle.active::after {
+            transform: translateX(20px);
+        }
+
+        .source-image {
+            border: 1px solid #E0E0E0;
+            border-radius: 10px;
+            padding: 0.8rem;
+            background: #FAFAFA;
+            display: none;
+        }
+
+        .source-image.visible {
+            display: block;
+        }
+
+        .source-preview {
+            width: 100%;
+            max-height: 120px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px dashed #E040FB;
+            background: #FAE8FF;
+            border-radius: 8px;
+            color: #E040FB;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: #E040FB;
+            color: #fff;
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+
+        .preset-btn {
+            background: #FAE8FF;
+            border: 1px solid #E9D5FF;
+            color: #9333EA;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            background: #E040FB;
+            color: white;
+            border-color: #E040FB;
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            background: linear-gradient(135deg, #E040FB, #7C4DFF);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(224, 64, 251, 0.3);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px -1px rgba(224, 64, 251, 0.4);
+        }
+
+        .btn-generate:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .status.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #E0E0E0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E040FB, #7C4DFF);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        /* Main Content */
+        .main {
+            display: flex;
+            flex-direction: column;
+            background: #F3F4F6;
+            height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+            padding-bottom: 0;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #9CA3AF;
+        }
+
+        .video-container {
+            display: none;
+            flex: 1;
+            width: 100%;
+            max-width: 1024px;
+            margin: 0 auto;
+            position: relative;
+            background: #000;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .video-container.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-container video {
+            width: 100%;
+            max-height: calc(100vh - 200px);
+            object-fit: contain;
+        }
+
+        .video-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+
+        /* Gallery */
+        .gallery-wrapper {
+            position: relative;
+            background: #fff;
+            border-top: 1px solid #E5E5E5;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            flex-shrink: 0;
+            min-height: 100px;
+        }
+
+        .gallery {
+            display: flex;
+            gap: 12px;
+            padding: 0 50px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            width: 100%;
+        }
+
+        .gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-item {
+            width: 120px;
+            height: 70px;
+            min-width: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            position: relative;
+            background: #111;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border-color: #E040FB;
+        }
+
+        .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.4rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #E5E5E5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .gallery-nav-btn:hover {
+            background: #E040FB;
+            color: white;
+            border-color: #E040FB;
+        }
+
+        .gallery-nav-btn.prev {
+            left: 8px;
+        }
+
+        .gallery-nav-btn.next {
+            right: 8px;
+        }
+
+        /* Nav menu */
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-menu a {
+            flex: 1;
+            padding: 0.5rem;
+            background: #F0F0F0;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            color: #666;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .nav-menu a:hover {
+            background: #E0E0E0;
+        }
+
+        .nav-menu a.active {
+            background: linear-gradient(135deg, #E040FB, #7C4DFF);
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <a href="/" class="back-link">← Dashboard</a>
+
+            <div>
+                <h1>Video AI <span class="video-tag">VIDEO</span></h1>
+                <p class="subtitle">Generate cinematic videos with AI</p>
+            </div>
+
+            <!-- Mode Toggle -->
+            <div>
+                <label>Mode</label>
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="mode-text2video" onclick="setMode('text2video')">✨ Text →
+                        Video</button>
+                    <button class="mode-btn" id="mode-img2video" onclick="setMode('img2video')">🖼 Image →
+                        Video</button>
+                </div>
+            </div>
+
+            <!-- Model Selection -->
+            <div>
+                <label>Model</label>
+                <select id="model" onchange="onModelChange()">
+                    <option value="seedance">Seedance (2-10s)</option>
+                    <option value="seedance-pro">Seedance Pro (2-10s)</option>
+                    <option value="veo">Veo (4-8s, Audio)</option>
+                </select>
+            </div>
+
+            <!-- Source Image (for img2video) -->
+            <div class="source-image" id="source-container">
+                <label>Source Image</label>
+                <img id="source-preview" class="source-preview" src="" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('file-upload').click()">
+                    📁 Upload Image
+                </button>
+            </div>
+
+            <!-- Prompt -->
+            <div>
+                <label id="prompt-label">Video Prompt</label>
+                <textarea id="prompt" placeholder="Describe the video motion and scene..."></textarea>
+                <div class="presets">
+                    <button class="preset-btn" onclick="setPreset('A cat walking in a garden, cinematic')">🐱
+                        Cat</button>
+                    <button class="preset-btn" onclick="setPreset('Ocean waves crashing on beach, sunset')">🌊
+                        Ocean</button>
+                    <button class="preset-btn" onclick="setPreset('City skyline timelapse, night to day')">🌃
+                        City</button>
+                    <button class="preset-btn" onclick="setPreset('Flying through clouds, POV drone shot')">☁️
+                        Clouds</button>
+                </div>
+            </div>
+
+            <!-- Duration -->
+            <div>
+                <label>Duration</label>
+                <div class="range-container">
+                    <input type="range" id="duration" min="2" max="10" value="4" oninput="updateDuration()">
+                    <span class="range-value" id="duration-value">4s</span>
+                </div>
+            </div>
+
+            <!-- Aspect Ratio -->
+            <div>
+                <label>Aspect Ratio</label>
+                <div class="aspect-buttons">
+                    <button class="aspect-btn active" id="aspect-16-9" onclick="setAspect('16:9')">16:9
+                        Landscape</button>
+                    <button class="aspect-btn" id="aspect-9-16" onclick="setAspect('9:16')">9:16 Portrait</button>
+                </div>
+            </div>
+
+            <!-- Audio Toggle (Veo only) -->
+            <div class="toggle-container" id="audio-container" style="display: none;">
+                <span class="toggle-label">🔊 Generate Audio (Veo)</span>
+                <div class="toggle" id="audio-toggle" onclick="toggleAudio()"></div>
+            </div>
+
+            <button class="btn-generate" id="gen-btn" onclick="generate()">🎬 Generate Video</button>
+
+            <div class="status" id="status">
+                <span>Generating video...</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+            </div>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="file-upload" accept="image/*" style="display: none;"
+                onchange="handleFileUpload(this)">
+        </aside>
+
+        <main class="main">
+            <div class="empty-state" id="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64"
+                    style="margin-bottom: 16px; color: #d1d5db;">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <p>Your generated video will appear here</p>
+            </div>
+
+            <div class="video-container" id="video-container">
+                <video id="result-video" controls></video>
+                <div class="video-actions">
+                    <button class="action-btn" onclick="downloadVideo()" title="Download">⬇️</button>
+                    <button class="action-btn" onclick="closeVideo()" title="Close">✕</button>
+                </div>
+            </div>
+
+            <div class="gallery-wrapper">
+                <button class="gallery-nav-btn prev" onclick="scrollGallery(-1)">❮</button>
+                <div class="gallery" id="gallery">
+                    <!-- Videos will be loaded here -->
+                </div>
+                <button class="gallery-nav-btn next" onclick="scrollGallery(1)">❯</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentMode = 'text2video';
+        let currentAspect = '16:9';
+        let audioEnabled = false;
+        let sourceImageUrl = null;
+        let currentVideoUrl = null;
+
+        function setMode(mode) {
+            currentMode = mode;
+            const t2vBtn = document.getElementById('mode-text2video');
+            const i2vBtn = document.getElementById('mode-img2video');
+            const sourceContainer = document.getElementById('source-container');
+            const modelSelect = document.getElementById('model');
+
+            t2vBtn.classList.remove('active');
+            i2vBtn.classList.remove('active');
+
+            if (mode === 'text2video') {
+                t2vBtn.classList.add('active');
+                sourceContainer.classList.remove('visible');
+            } else {
+                i2vBtn.classList.add('active');
+                sourceContainer.classList.add('visible');
+                modelSelect.value = 'seedance';
+                onModelChange();
+            }
+        }
+
+        function onModelChange() {
+            const model = document.getElementById('model').value;
+            const durationInput = document.getElementById('duration');
+            const audioContainer = document.getElementById('audio-container');
+
+            if (model === 'veo') {
+                durationInput.min = 4;
+                durationInput.max = 8;
+                durationInput.step = 2;
+                if (durationInput.value < 4) durationInput.value = 4;
+                if (durationInput.value > 8) durationInput.value = 8;
+                audioContainer.style.display = 'flex';
+
+                if (currentMode === 'img2video') {
+                    setMode('text2video');
+                }
+            } else {
+                durationInput.min = 2;
+                durationInput.max = 10;
+                durationInput.step = 1;
+                audioContainer.style.display = 'none';
+            }
+            updateDuration();
+        }
+
+        function updateDuration() {
+            const val = document.getElementById('duration').value;
+            document.getElementById('duration-value').textContent = val + 's';
+        }
+
+        function setAspect(aspect) {
+            currentAspect = aspect;
+            document.querySelectorAll('.aspect-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('aspect-' + aspect.replace(':', '-')).classList.add('active');
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('audio-toggle').classList.toggle('active', audioEnabled);
+        }
+
+        function setPreset(text) {
+            document.getElementById('prompt').value = text;
+        }
+
+        async function handleFileUpload(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.b2_url) {
+                    sourceImageUrl = data.b2_url;
+                    const preview = document.getElementById('source-preview');
+                    preview.src = data.b2_url;
+                    preview.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Upload failed:', e);
+                alert('Upload failed.');
+            }
+        }
+
+        async function generate() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                alert('Please enter a video description');
+                return;
+            }
+
+            const model = document.getElementById('model').value;
+            const duration = parseInt(document.getElementById('duration').value);
+
+            if (currentMode === 'img2video' && !sourceImageUrl) {
+                alert('Please upload a source image for Image → Video mode');
+                return;
+            }
+
+            const btn = document.getElementById('gen-btn');
+            const status = document.getElementById('status');
+            const progress = document.getElementById('progress');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+            status.classList.add('visible');
+            progress.style.width = '0%';
+
+            let progressVal = 0;
+            const progressInterval = setInterval(() => {
+                progressVal += Math.random() * 5;
+                if (progressVal > 90) progressVal = 90;
+                progress.style.width = progressVal + '%';
+            }, 500);
+
+            try {
+                const payload = {
+                    prompt: prompt,
+                    model: model,
+                    duration: duration,
+                    aspect_ratio: currentAspect,
+                    audio: audioEnabled
+                };
+
+                if (currentMode === 'img2video' && sourceImageUrl) {
+                    payload.image_url = sourceImageUrl;
+                }
+
+                const response = await fetch('/api/generate/pollinations/video', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                clearInterval(progressInterval);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Video generation failed');
+                }
+
+                const data = await response.json();
+                progress.style.width = '100%';
+
+                if (data.url) {
+                    currentVideoUrl = data.b2_url || data.url;
+                    showVideo(currentVideoUrl);
+                }
+
+            } catch (e) {
+                clearInterval(progressInterval);
+                console.error('Generation error:', e);
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🎬 Generate Video';
+                setTimeout(() => status.classList.remove('visible'), 2000);
+            }
+        }
+
+        function showVideo(url) {
+            const video = document.getElementById('result-video');
+            const container = document.getElementById('video-container');
+            const emptyState = document.getElementById('empty-state');
+
+            video.src = url;
+            container.classList.add('visible');
+            emptyState.style.display = 'none';
+            video.play();
+        }
+
+        function closeVideo() {
+            document.getElementById('video-container').classList.remove('visible');
+            document.getElementById('empty-state').style.display = 'block';
+        }
+
+        function downloadVideo() {
+            if (!currentVideoUrl) return;
+            const a = document.createElement('a');
+            a.href = currentVideoUrl;
+            a.download = 'video_' + Date.now() + '.mp4';
+            a.click();
+        }
+
+        function scrollGallery(direction) {
+            const gallery = document.getElementById('gallery');
+            gallery.scrollBy({ left: direction * 300, behavior: 'smooth' });
+        }
+
+        // Video Gallery
+        async function loadVideoGallery() {
+            try {
+                const res = await fetch('/api/gallery/video');
+                if (!res.ok) return;
+                const videos = await res.json();
+
+                const gallery = document.getElementById('gallery');
+                if (videos.length === 0) {
+                    gallery.innerHTML = '<p style="color:#999; font-size:0.8rem;">No videos yet</p>';
+                    return;
+                }
+
+                gallery.innerHTML = videos.map(v => `
+                    <div class="gallery-item" onclick="showVideo('${v.b2_url || v.url}')">
+                        <video src="${v.b2_url || v.url}" muted></video>
+                        <span class="play-icon">▶</span>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to load gallery:', e);
+            }
+        }
+
+        async function refreshGallery() {
+            try {
+                await fetch('/api/gallery/refresh/video', { method: 'POST' });
+                await loadVideoGallery();
+            } catch (e) {
+                console.error('Refresh failed:', e);
+            }
+        }
+
+        // Initialize
+        onModelChange();
+        loadVideoGallery();
+    </script>
+</body>
+
+</html>

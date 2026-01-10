@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APIFrame Pro - Cinematic AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FAFAFA;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: #fff;
+            border-right: 1px solid #E5E5E5;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #6366F1;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .pro-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            color: white;
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        textarea {
+            width: 100%;
+            background: #FAFAFA;
+            border: 1px solid #E0E0E0;
+            border-radius: 10px;
+            padding: 0.7rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            height: 100px;
+            color: #333;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            background: #fff;
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.4rem;
+        }
+
+        .preset-btn {
+            background: #F5F3FF;
+            border: 1px solid #DDD6FE;
+            color: #7C3AED;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            background: #8B5CF6;
+            color: white;
+            border-color: #8B5CF6;
+        }
+
+        select {
+            width: 100%;
+            background: #FAFAFA;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 0.6rem;
+            font-size: 0.85rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #8B5CF6;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: auto;
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px -1px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-generate:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+
+        /* Use existing main/gallery styles */
+        .main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #F3F4F6;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #9CA3AF;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .image-container {
+            display: none;
+            flex: 1;
+            width: 100%;
+            min-height: 0;
+            max-width: 1024px;
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 0px;
+            align-items: center;
+            justify-content: center;
+            max-height: calc(100vh - 180px);
+        }
+
+        .image-container.visible {
+            display: flex;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-actions {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            border-color: #8B5CF6;
+        }
+
+        /* Gallery reused */
+        .gallery-wrapper {
+            position: relative;
+            background: #F8F9FA;
+            border-top: 1px solid #E5E5E5;
+            padding: 16px 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .gallery {
+            display: flex;
+            gap: 12px;
+            padding: 0 50px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            width: 100%;
+        }
+
+        .gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-item {
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item.active {
+            border-color: #8B5CF6;
+            transform: scale(1.05);
+        }
+
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #E5E5E5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .gallery-nav-btn:hover {
+            background: #8B5CF6;
+            color: white;
+            border-color: #8B5CF6;
+        }
+
+        .gallery-nav-btn.prev {
+            left: 8px;
+        }
+
+        .gallery-nav-btn.next {
+            right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <a href="/" class="back-link">← Dashboard</a>
+
+            <!-- Navigation Menu -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <a href="/pollinations"
+                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">✨
+                    Images</a>
+                <a href="/apiframe"
+                    style="flex:1; padding: 0.5rem; background: linear-gradient(135deg, #8B5CF6, #6366F1); border-radius: 8px; text-decoration: none; text-align: center; color: #fff; font-size: 0.75rem;">🚀
+                    Pro</a>
+                <a href="/video"
+                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🎬
+                    Video</a>
+            </div>
+
+            <!-- Mode Toggle -->
+            <div style="margin-top: 15px;">
+                <label>Mode</label>
+                <div class="mode-toggle" style="display: flex; background: #F0F0F0; border-radius: 8px; padding: 3px;">
+                    <button class="mode-btn active" onclick="setMode('create')" id="mode-create"
+                        style="flex: 1; padding: 8px; border:none; border-radius: 6px; cursor: pointer;">✨
+                        Create</button>
+                    <button class="mode-btn" onclick="setMode('edit')" id="mode-edit"
+                        style="flex: 1; padding: 8px; border:none; border-radius: 6px; cursor: pointer;">🖌️
+                        Edit</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <label>Model</label>
+                <select id="model" onchange="checkModel()">
+                    <option value="ideogram">Ideogram (Typography)</option>
+                    <option value="flux">FLUX.1 (Pro Realism)</option>
+                    <option value="nano-banana">Nano Banana (Pro Edit)</option>
+                </select>
+            </div>
+
+            <!-- Source Image Preview (for Edit mode) -->
+            <div class="source-image" id="source-image-container"
+                style="display: none; border: 1px solid #E0E0E0; border-radius: 10px; padding: 10px; background: #FAFAFA; margin-top: 15px;">
+                <img id="source-preview" src="" alt="Source image"
+                    style="max-width: 100%; max-height: 120px; display: block; margin: 0 auto; border-radius: 8px;">
+                <div style="font-size: 11px; color: #888; text-align: center; margin-top: 5px;">Source image</div>
+            </div>
+
+            <!-- Upload Button for Edit Mode -->
+            <div id="upload-container" style="display: none; margin-top: 10px;">
+                <button onclick="document.getElementById('file-upload').click()"
+                    style="width: 100%; padding: 8px; background: #EEF2FF; color: #6366F1; border: 1px dashed #6366F1; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                    📁 Upload Source Image
+                </button>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <label id="prompt-label">Prompt</label>
+                <textarea id="prompt" placeholder="Describe your masterpiece..."></textarea>
+                <div class="presets" id="presets">
+                    <!-- Presets will be dynamic -->
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <label>Aspect Ratio</label>
+                <select disabled style="opacity: 0.6; background: #eee;">
+                    <option>1:1 (Square)</option>
+                </select>
+            </div>
+
+            <button class="btn-generate" id="gen-btn" onclick="generate()">Generate (Pro)</button>
+            <p class="status" id="status">Converting credits to art...</p>
+
+            <div style="text-align: center; margin-top: 10px;">
+                <button id="refresh-btn" onclick="refreshGallery()"
+                    style="background:none; border:none; color:#666; cursor:pointer; font-size: 0.8rem;">↻ Refresh
+                    Gallery</button>
+            </div>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="file-upload" accept="image/*" style="display: none;"
+                onchange="handleFileUpload(this)">
+        </aside>
+
+        <main class="main">
+            <!-- Reuse main content -->
+            <div class="empty-state" id="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64"
+                    style="margin-bottom: 16px; color: #d1d5db;">
+                    <path
+                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                    </path>
+                </svg>
+                <p>Premium outputs appear here</p>
+            </div>
+
+            <div class="image-container" id="image-container">
+                <img id="result-img" src="" alt="Generated">
+                <div class="image-actions">
+                    <button class="action-btn" onclick="useAsSource()" title="Use as Input">🖌️</button>
+                    <button class="action-btn" onclick="downloadImage()" title="Download">⬇️</button>
+                    <button class="action-btn" onclick="closeImage()" title="Close">✕</button>
+                </div>
+            </div>
+
+            <div class="gallery-wrapper">
+                <button class="gallery-nav-btn prev" onclick="scrollGallery(-1)">❮</button>
+                <div class="gallery" id="gallery"></div>
+                <button class="gallery-nav-btn next" onclick="scrollGallery(1)">❯</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentMode = 'create';
+        let sourceB2Url = null;
+        let galleryData = [];
+        let previousCreateModel = 'ideogram';
+
+        function setMode(mode) {
+            currentMode = mode;
+            const createBtn = document.getElementById('mode-create');
+            const editBtn = document.getElementById('mode-edit');
+            const sourceContainer = document.getElementById('source-image-container');
+            const uploadBtn = document.getElementById('upload-container');
+            const promptLabel = document.getElementById('prompt-label');
+            const presetsDiv = document.getElementById('presets');
+            const modelSelect = document.getElementById('model');
+
+            // Reset UI States
+            createBtn.classList.remove('active');
+            createBtn.style.background = 'transparent';
+            createBtn.style.color = '#666';
+
+            editBtn.classList.remove('active');
+            editBtn.style.background = 'transparent';
+            editBtn.style.color = '#666';
+
+            if (mode === 'create') {
+                createBtn.classList.add('active');
+                createBtn.style.background = '#fff';
+                createBtn.style.color = '#111';
+
+                sourceContainer.style.display = 'none';
+                uploadBtn.style.display = 'none';
+                promptLabel.textContent = 'Prompt';
+
+                presetsDiv.innerHTML = `
+                    <button class="preset-btn" onclick="setPreset('Logo design for a coffee shop')">Logo</button>
+                    <button class="preset-btn" onclick="setPreset('Cyberpunk city neon')">Neon</button>
+                    <button class="preset-btn" onclick="setPreset('Cinematic portrait, 8k')">Portrait</button>
+                `;
+
+                // Enable all models options
+                Array.from(modelSelect.options).forEach(opt => opt.disabled = false);
+
+                // If we recorded a previous preference for Create mode, maybe restore it?
+                // Or simply let it be. User wants flexibility.
+                // Let's not auto-change model when entering Create, unless user wants.
+
+            } else { // Edit Mode
+                editBtn.classList.add('active');
+                editBtn.style.background = '#fff';
+                editBtn.style.color = '#111';
+
+                if (sourceB2Url) {
+                    sourceContainer.style.display = 'block';
+                }
+                uploadBtn.style.display = 'block';
+                promptLabel.textContent = 'Edit Instruction';
+
+                presetsDiv.innerHTML = `
+                    <button class="preset-btn" onclick="setPreset('Make it sunset')">Sunset</button>
+                    <button class="preset-btn" onclick="setPreset('Turn into oil painting')">Oil Painting</button>
+                    <button class="preset-btn" onclick="setPreset('Add cyberpunk lights')">Cyberpunk</button>
+                `;
+
+                // Save current model if it's not Nano, so we can restore later if we wanted to (optional)
+                if (modelSelect.value !== 'nano-banana') {
+                    previousCreateModel = modelSelect.value;
+                }
+
+                // Force Nano Banana for Edit
+                modelSelect.value = 'nano-banana';
+
+                // Disable other options in Edit mode
+                Array.from(modelSelect.options).forEach(opt => {
+                    if (opt.value !== 'nano-banana') opt.disabled = true;
+                });
+            }
+        }
+
+        function checkModel() {
+            // User changed model manually.
+            // If in Create Mode, they can choose whatever they want (Ideogram, Flux, Nano).
+            // No auto-switching logic needed anymore.
+        }
+
+        function setPreset(text) {
+            document.getElementById('prompt').value = text;
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.textContent = 'Uploading source image...';
+
+            try {
+                // Use existing upload endpoint, but maybe we should ensure it uploads to 'apiFrame/source'?
+                // For now standard upload is fine, we get a B2 URL back.
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (res.status !== 200) throw new Error("Upload failed");
+                const data = await res.json();
+
+                sourceB2Url = data.b2_url; // This is the public URL
+
+                document.getElementById('source-preview').src = sourceB2Url;
+                document.getElementById('source-image-container').style.display = 'block';
+
+                // Auto switch to edit mode
+                setMode('edit');
+                status.style.display = 'none';
+
+            } catch (e) {
+                status.textContent = 'Upload Error: ' + e.message;
+            }
+        }
+
+        function useAsSource() {
+            const img = document.getElementById('result-img');
+            if (img.src) {
+                sourceB2Url = img.src;
+                document.getElementById('source-preview').src = sourceB2Url;
+                setMode('edit');
+            }
+        }
+
+        async function generate() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) return document.getElementById('prompt').focus();
+
+            // If in Edit mode, ensure we have a source image
+            if (currentMode === 'edit' && !sourceB2Url) {
+                alert("Please upload or select a source image for Edit mode.");
+                return;
+            }
+
+            const btn = document.getElementById('gen-btn');
+            const status = document.getElementById('status');
+            const model = document.getElementById('model').value;
+
+            btn.disabled = true;
+            status.style.display = 'block';
+            status.textContent = 'Submitting task to APIFrame...';
+            status.style.color = '#888';
+
+            document.getElementById('image-container').classList.remove('visible');
+            document.getElementById('empty-state').style.display = 'none';
+
+            try {
+                const payload = {
+                    prompt,
+                    model: model,
+                    source_image: sourceB2Url // Send source image if available
+                };
+
+                const res = await fetch('/api/generate/apiframe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.status !== 200) {
+                    const error = await res.json();
+                    throw new Error(error.detail || 'Failed');
+                }
+
+                status.textContent = 'Rendering (this takes 30-60s)...';
+                if (model === 'nano-banana') status.textContent = 'Processing (Nano is fast!)...';
+
+                const data = await res.json();
+
+                if (data.url) {
+                    showImage(data.b2_url || data.url);
+                    status.style.display = 'none';
+                    loadGallery(); // Refresh gallery
+                }
+
+            } catch (e) {
+                status.textContent = 'Error: ' + e.message;
+                status.style.color = '#EF4444';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function showImage(url) {
+            const img = document.getElementById('result-img');
+            img.src = url;
+            img.onload = () => {
+                document.getElementById('image-container').classList.add('visible');
+            };
+        }
+
+        function closeImage() {
+            document.getElementById('image-container').classList.remove('visible');
+            document.getElementById('empty-state').style.display = 'block';
+        }
+
+        function downloadImage() {
+            const img = document.getElementById('result-img');
+            if (img.src) {
+                const a = document.createElement('a');
+                a.href = img.src;
+                a.download = `apiframe_${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        }
+
+        // Initialize UI
+        setMode('create');
+
+        // Gallery Logic
+        async function loadGallery() {
+            try {
+                const res = await fetch('/api/gallery/apiframe');
+                if (res.status !== 200) return;
+                const data = await res.json();
+                galleryData = data;
+
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = galleryData.map(item => `
+                    <div class="gallery-item" onclick="showImage('${item.b2_url || item.url}')">
+                        <img src="${item.b2_url || item.url}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Gallery Error:", e);
+            }
+        }
+
+        async function refreshGallery() {
+            try {
+                const btn = document.getElementById('refresh-btn');
+                btn.textContent = '↻';
+                btn.disabled = true;
+
+                await fetch('/api/gallery/refresh/apiframe', { method: 'POST' });
+                await loadGallery();
+
+                btn.textContent = '↻ Refresh';
+                btn.disabled = false;
+            } catch (e) { console.error(e); }
+        }
+
+        function scrollGallery(direction) {
+            const gallery = document.getElementById('gallery');
+            const scrollAmount = 300;
+            gallery.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        // Init
+        loadGallery();
+    </script>
+</body>
+
+</html>
+```
