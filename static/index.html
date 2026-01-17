@@ -90,6 +90,15 @@
             color: white;
         }
 
+        .card.kling:hover {
+            border-color: #3B82F6;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+        }
+
+        .card.kling:hover .icon {
+            color: #3B82F6;
+        }
+
         .badge {
             position: absolute;
             top: 24px;
@@ -107,21 +116,21 @@
 
     <div class="container">
         <h1>Cinematic AI Studio</h1>
-        <p class="subtitle">Select your creative tool</p>
+        <p class="subtitle">Chọn công cụ sáng tạo của bạn</p>
 
         <div class="grid">
             <a href="pollinations" class="card pollinations">
-                <span class="badge">Free</span>
+                <span class="badge">Miễn phí</span>
                 <div class="icon">✨</div>
                 <h2>Pollinations AI</h2>
-                <p>Generate amazing images using Flux and Turbo models. Unlimited, fast, and completely free.</p>
+                <p>Tạo hình ảnh tuyệt đẹp với Flux và Turbo. Không giới hạn, nhanh chóng và hoàn toàn miễn phí.</p>
             </a>
 
             <a href="apiframe" class="card apiframe">
                 <span class="badge">Pro</span>
                 <div class="icon">🚀</div>
                 <h2>APIFrame Pro</h2>
-                <p>Access premium models like Ideogram and Midjourney. Typography support, high fidelity.</p>
+                <p>Truy cập các model cao cấp như Ideogram và Midjourney. Hỗ trợ typography, chất lượng cao.</p>
             </a>
 
             <a href="video" class="card video">
@@ -129,7 +138,15 @@
                     style="background: linear-gradient(135deg, #E040FB, #7C4DFF); color: white;">Video</span>
                 <div class="icon">🎬</div>
                 <h2>Video AI</h2>
-                <p>Create cinematic AI videos with Veo and Seedance. Text-to-video and image-to-video generation.</p>
+                <p>Tạo video AI điện ảnh với Veo và Seedance. Chuyển văn bản và hình ảnh thành video.</p>
+            </a>
+
+            <a href="kling" class="card kling">
+                <span class="badge"
+                    style="background: linear-gradient(135deg, #3B82F6, #8B5CF6); color: white;">Kling</span>
+                <div class="icon">⚡</div>
+                <h2>Kling AI</h2>
+                <p>Tạo video cao cấp từ Kuaishou. Chất lượng chuyên nghiệp với nhiều tùy chỉnh nâng cao.</p>
             </a>
         </div>
     </div>

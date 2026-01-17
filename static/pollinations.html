@@ -537,18 +537,74 @@
             right: 8px;
         }
 
-        @media (max-width: 800px) {
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 900px) {
             .container {
                 grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
             }
 
             .sidebar {
                 border-right: none;
                 border-bottom: 1px solid #E5E5E5;
+                padding: 1rem;
+                height: auto;
+                max-height: none;
+                /* Removed limit */
             }
 
             .main {
-                min-height: 50vh;
+                min-height: 60vh;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                padding: 0.75rem;
+                gap: 0.6rem;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .subtitle {
+                font-size: 0.75rem;
+            }
+
+            label {
+                font-size: 0.75rem;
+            }
+
+            select,
+            textarea,
+            input[type="text"] {
+                font-size: 0.85rem;
+                padding: 0.6rem;
+            }
+
+            textarea {
+                min-height: 50px;
+            }
+
+            .gen-btn {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .gallery-wrapper {
+                padding: 0.5rem 0;
+            }
+
+            .gallery-item {
+                width: 70px;
+                height: 70px;
             }
         }
     </style>
@@ -557,49 +613,49 @@
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="./" class="back-link">← Dashboard</a>
+            <a href="./" class="back-link">← Trang chủ</a>
 
             <!-- Navigation Menu -->
             <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <a href="pollinations"
                     style="flex:1; padding: 0.5rem; background: #10B981; border-radius: 8px; text-decoration: none; text-align: center; color: #fff; font-size: 0.75rem;">✨
-                    Images</a>
-                <a href="apiframe"
-                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🚀
-                    Pro</a>
+                    Hình ảnh</a>
                 <a href="video"
                     style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">🎬
                     Video</a>
+                <a href="kling"
+                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">⚡
+                    Kling</a>
             </div>
 
             <div>
-                <h1>Pollinations AI <span class="free-tag">FREE</span></h1>
-                <p class="subtitle">Open source image generation</p>
+                <h1>Pollinations AI <span class="free-tag">MIỄN PHÍ</span></h1>
+                <p class="subtitle">Tạo hình ảnh AI mã nguồn mở</p>
             </div>
 
             <!-- Mode Toggle -->
             <div>
-                <label>Mode</label>
+                <label>Chế độ</label>
                 <div class="mode-toggle">
-                    <button class="mode-btn active" onclick="setMode('create')" id="mode-create">✨ Create</button>
-                    <button class="mode-btn" onclick="setMode('edit')" id="mode-edit">🖌️ Edit</button>
-                    <button class="mode-btn" onclick="setMode('text')" id="mode-text">📝 Prompt</button>
+                    <button class="mode-btn active" onclick="setMode('create')" id="mode-create">✨ Tạo mới</button>
+                    <button class="mode-btn" onclick="setMode('edit')" id="mode-edit">🖌️ Chỉnh sửa</button>
+                    <button class="mode-btn" onclick="setMode('text')" id="mode-text">📝 Tối ưu Prompt</button>
                 </div>
             </div>
 
             <!-- Source Image Preview (for Edit mode) -->
             <div class="source-image" id="source-image-container">
-                <img id="source-preview" src="" alt="Source image">
-                <div class="source-image-label">Source image (from cloud)</div>
+                <img id="source-preview" src="" alt="Ảnh nguồn">
+                <div class="source-image-label">Ảnh nguồn (từ cloud)</div>
             </div>
 
             <div>
-                <label id="prompt-label">Prompt</label>
-                <textarea id="prompt" placeholder="Describe your image..."></textarea>
+                <label id="prompt-label">Mô tả</label>
+                <textarea id="prompt" placeholder="Mô tả hình ảnh bạn muốn tạo..."></textarea>
                 <div class="presets" id="presets">
-                    <button class="preset-btn" onclick="usePreset('portrait')">Portrait</button>
-                    <button class="preset-btn" onclick="usePreset('landscape')">Landscape</button>
-                    <button class="preset-btn" onclick="usePreset('fantasy')">Fantasy</button>
+                    <button class="preset-btn" onclick="usePreset('portrait')">Chân dung</button>
+                    <button class="preset-btn" onclick="usePreset('landscape')">Phong cảnh</button>
+                    <button class="preset-btn" onclick="usePreset('fantasy')">Giả tưởng</button>
                     <button class="preset-btn" onclick="usePreset('anime')">Anime</button>
                 </div>
             </div>
@@ -607,21 +663,21 @@
             <!-- Optimized Prompt Output (for Text mode) -->
             <div class="optimized-output" id="optimized-output">
                 <div class="optimized-output-header">
-                    <span>✨ Optimized Prompt</span>
+                    <span>✨ Prompt đã tối ưu</span>
                     <div class="optimized-output-actions">
-                        <button onclick="copyOptimized()">📋 Copy</button>
-                        <button onclick="useOptimized()">🎨 Use</button>
+                        <button onclick="copyOptimized()">📋 Sao chép</button>
+                        <button onclick="useOptimized()">🎨 Sử dụng</button>
                     </div>
                 </div>
                 <p id="optimized-text"></p>
             </div>
 
             <div id="settings-container">
-                <label>Model & Size</label>
+                <label>Model & Kích thước</label>
                 <div class="row-2">
                     <select id="model">
-                        <option value="flux">FLUX (Best)</option>
-                        <option value="turbo">Turbo (Fast)</option>
+                        <option value="flux">FLUX (Tốt nhất)</option>
+                        <option value="turbo">Turbo (Nhanh)</option>
                         <option value="zimage">Z-Image</option>
                     </select>
                     <select id="resolution" onchange="setRes()">
@@ -632,8 +688,8 @@
                 </div>
             </div>
 
-            <button class="btn-generate" id="gen-btn" onclick="generate()">Generate</button>
-            <p class="status" id="status">Generating...</p>
+            <button class="btn-generate" id="gen-btn" onclick="generate()">Tạo hình ảnh</button>
+            <p class="status" id="status">Đang tạo...</p>
 
             <!-- Hidden File Input -->
             <input type="file" id="file-upload" accept="image/*" style="display: none;"
@@ -646,15 +702,15 @@
                     <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
                     <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" />
                 </svg>
-                <p>Your AI image will appear here</p>
+                <p>Hình ảnh AI của bạn sẽ xuất hiện tại đây</p>
             </div>
 
             <div class="image-container" id="image-container">
-                <img id="result-img" src="" alt="Generated">
+                <img id="result-img" src="" alt="Đã tạo">
                 <div class="image-actions">
-                    <button class="action-btn" onclick="useAsSource()" title="Edit this">🖌️</button>
-                    <button class="action-btn" onclick="downloadImage()" title="Download">⬇️</button>
-                    <button class="action-btn" onclick="closeImage()" title="Close">✕</button>
+                    <button class="action-btn" onclick="useAsSource()" title="Chỉnh sửa ảnh này">🖌️</button>
+                    <button class="action-btn" onclick="downloadImage()" title="Tải xuống">⬇️</button>
+                    <button class="action-btn" onclick="closeImage()" title="Đóng">✕</button>
                 </div>
             </div>
 
@@ -719,41 +775,41 @@
 
             if (mode === 'create') {
                 createBtn.classList.add('active');
-                promptLabel.textContent = 'Prompt';
-                prompt.placeholder = 'Describe your image...';
+                promptLabel.textContent = 'Mô tả';
+                prompt.placeholder = 'Mô tả hình ảnh bạn muốn tạo...';
                 prompt.classList.remove('tall');
-                genBtn.textContent = 'Generate';
+                genBtn.textContent = 'Tạo hình ảnh';
 
                 presetsDiv.innerHTML = `
-                    <button class="preset-btn" onclick="usePreset('portrait')">Portrait</button>
-                    <button class="preset-btn" onclick="usePreset('landscape')">Landscape</button>
-                    <button class="preset-btn" onclick="usePreset('fantasy')">Fantasy</button>
+                    <button class="preset-btn" onclick="usePreset('portrait')">Chân dung</button>
+                    <button class="preset-btn" onclick="usePreset('landscape')">Phong cảnh</button>
+                    <button class="preset-btn" onclick="usePreset('fantasy')">Giả tưởng</button>
                     <button class="preset-btn" onclick="usePreset('anime')">Anime</button>
                 `;
 
                 modelSelect.innerHTML = `
-                    <option value="flux">FLUX (Best)</option>
-                    <option value="turbo">Turbo (Fast)</option>
+                    <option value="flux">FLUX (Tốt nhất)</option>
+                    <option value="turbo">Turbo (Nhanh)</option>
                     <option value="zimage">Z-Image</option>
                     <option value="ideogram">Ideogram (Pro)</option>
                 `;
             } else if (mode === 'edit') {
                 editBtn.classList.add('active');
-                promptLabel.textContent = 'What to change';
-                prompt.placeholder = 'Describe what you want to change...';
+                promptLabel.textContent = 'Thay đổi gì';
+                prompt.placeholder = 'Mô tả những gì bạn muốn thay đổi...';
                 prompt.classList.remove('tall');
-                genBtn.textContent = 'Edit Image';
+                genBtn.textContent = 'Chỉnh sửa ảnh';
 
                 presetsDiv.innerHTML = `
-                    <button class="preset-btn" onclick="document.getElementById('file-upload').click()">📁 Upload</button>
-                    <button class="preset-btn" onclick="useEditPreset('style')">🎨 Style</button>
-                    <button class="preset-btn" onclick="useEditPreset('lighting')">💡 Light</button>
-                    <button class="preset-btn" onclick="useEditPreset('background')">🌅 BG</button>
-                    <button class="preset-btn" onclick="useEditPreset('remove')">🗑️ Remove</button>
+                    <button class="preset-btn" onclick="document.getElementById('file-upload').click()">📁 Tải lên</button>
+                    <button class="preset-btn" onclick="useEditPreset('style')">🎨 Phong cách</button>
+                    <button class="preset-btn" onclick="useEditPreset('lighting')">💡 Ánh sáng</button>
+                    <button class="preset-btn" onclick="useEditPreset('background')">🌅 Nền</button>
+                    <button class="preset-btn" onclick="useEditPreset('remove')">🗑️ Xóa</button>
                 `;
 
                 modelSelect.innerHTML = `
-                    <option value="kontext">Kontext (Edit)</option>
+                    <option value="kontext">Kontext (Chỉnh sửa)</option>
                 `;
 
                 if (sourceB2Url) {
@@ -761,18 +817,18 @@
                 }
             } else if (mode === 'text') {
                 textBtn.classList.add('active');
-                promptLabel.textContent = 'Your idea (simple is fine)';
-                prompt.placeholder = 'Describe what you want in simple words...\nExample: "a cat in garden" or "futuristic city"';
+                promptLabel.textContent = 'Ý tưởng của bạn (đơn giản là được)';
+                prompt.placeholder = 'Mô tả những gì bạn muốn bằng từ ngữ đơn giản...\nVí dụ: "mèo trong vườn" hoặc "thành phố tương lai"';
                 prompt.classList.add('tall');
-                genBtn.textContent = 'Optimize Prompt';
+                genBtn.textContent = 'Tối ưu Prompt';
                 genBtn.classList.add('purple');
                 settingsContainer.style.display = 'none';
 
                 presetsDiv.innerHTML = `
-                    <button class="preset-btn" onclick="useTextPreset('simple')">🐱 Cat</button>
+                    <button class="preset-btn" onclick="useTextPreset('simple')">🐱 Mèo</button>
                     <button class="preset-btn" onclick="useTextPreset('scene')">🌃 Cyberpunk</button>
-                    <button class="preset-btn" onclick="useTextPreset('product')">🎧 Product</button>
-                    <button class="preset-btn" onclick="useTextPreset('portrait')">👩 Portrait</button>
+                    <button class="preset-btn" onclick="useTextPreset('product')">🎧 Sản phẩm</button>
+                    <button class="preset-btn" onclick="useTextPreset('portrait')">👩 Chân dung</button>
                 `;
             }
         }
@@ -860,7 +916,7 @@
                 gallery.innerHTML = '';
 
                 if (galleryData.length === 0) {
-                    gallery.innerHTML = '<div style="padding: 20px; color: #999; width: 100%; text-align: center;">No images yet</div>';
+                    gallery.innerHTML = '<div style="padding: 20px; color: #999; width: 100%; text-align: center;">Chưa có hình ảnh</div>';
                     return;
                 }
 
@@ -886,7 +942,7 @@
             if (!prompt) return document.getElementById('prompt').focus();
 
             if (currentMode === 'edit' && !sourceB2Url) {
-                alert('Please select an image to edit first! Click 🖌️ on any image.');
+                alert('Vui lòng chọn một hình ảnh để chỉnh sửa trước! Nhấp 🖌️ trên bất kỳ hình ảnh nào.');
                 return;
             }
 
@@ -901,8 +957,8 @@
 
                 if (currentMode === 'text') {
                     // Text mode - optimize prompt
-                    btn.textContent = 'Optimizing...';
-                    status.textContent = 'AI is crafting your prompt...';
+                    btn.textContent = 'Đang tối ưu...';
+                    status.textContent = 'AI đang tạo prompt cho bạn...';
 
                     res = await fetch('api/generate/pollinations/text', {
                         method: 'POST',
@@ -923,13 +979,13 @@
                         lastOptimizedPrompt = data.optimized_prompt;
                         document.getElementById('optimized-text').textContent = lastOptimizedPrompt;
                         document.getElementById('optimized-output').classList.add('visible');
-                        status.textContent = '✨ Prompt optimized!';
+                        status.textContent = '✨ Đã tối ưu prompt!';
                         status.style.color = '#8B5CF6';
                     }
 
                 } else if (currentMode === 'edit') {
-                    btn.textContent = 'Editing...';
-                    status.textContent = 'Editing with cloud image...';
+                    btn.textContent = 'Đang chỉnh sửa...';
+                    status.textContent = 'Đang chỉnh sửa ảnh từ cloud...';
 
                     res = await fetch('api/generate/pollinations/img2img', {
                         method: 'POST',
@@ -948,16 +1004,16 @@
                     if (data.b2_url) {
                         showImage(data.b2_url, data.b2_url);
                         loadGallery();
-                        status.textContent = 'Saved to cloud!';
+                        status.textContent = 'Đã lưu vào cloud!';
                         status.style.color = '#10B981';
                     } else {
-                        throw new Error('Failed to upload to cloud');
+                        throw new Error('Không thể tải lên cloud');
                     }
 
                 } else {
                     // Create mode
-                    btn.textContent = 'Generating...';
-                    status.textContent = 'Creating your image...';
+                    btn.textContent = 'Đang tạo...';
+                    status.textContent = 'Đang tạo hình ảnh...';
 
                     const modelVal = document.getElementById('model').value;
                     let endpoint = 'api/generate/pollinations';
@@ -985,24 +1041,24 @@
                     if (data.b2_url) {
                         showImage(data.b2_url, data.b2_url);
                         loadGallery();
-                        status.textContent = 'Saved to cloud!';
+                        status.textContent = 'Đã lưu vào cloud!';
                         status.style.color = '#10B981';
                     } else {
-                        throw new Error('Failed to upload to cloud');
+                        throw new Error('Không thể tải lên cloud');
                     }
                 }
 
             } catch (e) {
-                status.textContent = 'Error: ' + e.message;
+                status.textContent = 'Lỗi: ' + e.message;
                 status.style.color = '#e53935';
             } finally {
                 btn.disabled = false;
                 if (currentMode === 'text') {
-                    btn.textContent = 'Optimize Prompt';
+                    btn.textContent = 'Tối ưu Prompt';
                 } else if (currentMode === 'edit') {
-                    btn.textContent = 'Edit Image';
+                    btn.textContent = 'Chỉnh sửa ảnh';
                 } else {
-                    btn.textContent = 'Generate';
+                    btn.textContent = 'Tạo hình ảnh';
                 }
                 setTimeout(() => { status.style.display = 'none'; status.style.color = '#888'; }, 3000);
             }
@@ -1028,7 +1084,7 @@
 
             const status = document.getElementById('status');
             status.style.display = 'block';
-            status.textContent = 'Uploading to B2...';
+            status.textContent = 'Đang tải lên B2...';
 
             try {
                 const res = await fetch('api/upload', {
@@ -1051,16 +1107,16 @@
                     // Refresh gallery
                     loadGallery();
 
-                    status.textContent = 'Upload successful!';
+                    status.textContent = 'Tải lên thành công!';
                     status.style.color = '#10B981';
 
                     // console.log("Set source to:", data.b2_url);
                 } else {
-                    throw new Error('No B2 URL returned');
+                    throw new Error('Không nhận được URL B2');
                 }
             } catch (e) {
-                alert('Upload failed: ' + e.message);
-                status.textContent = 'Upload failed';
+                alert('Tải lên thất bại: ' + e.message);
+                status.textContent = 'Tải lên thất bại';
                 status.style.color = '#e53935';
             } finally {
                 input.value = ''; // Reset input

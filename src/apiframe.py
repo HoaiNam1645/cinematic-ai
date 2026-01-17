@@ -9,7 +9,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from .shared import (
+from shared import (
     download_and_upload_to_b2, 
     cache_apiframe, 
     refresh_cache,

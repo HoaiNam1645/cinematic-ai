@@ -7,7 +7,7 @@ from urllib.parse import quote
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from .shared import (
+from shared import (
     download_and_upload_to_b2,
     download_and_upload_video_to_b2,
     upload_video_to_b2,
@@ -319,8 +319,8 @@ async def generate_pollinations_video(request: PollinationsVideoRequest):
             f"&seed={int(time.time())}"
         )
         
-        # Add image for image-to-video (seedance only)
-        if request.image_url and request.model in ["seedance", "seedance-pro"]:
+        # Add image for image-to-video (supported by seedance, video, luma, kling, etc)
+        if request.image_url:
             encoded_image = quote(request.image_url, safe='')
             video_url += f"&image={encoded_image}"
             print(f"[VIDEO GEN] Mode: IMAGE-TO-VIDEO")

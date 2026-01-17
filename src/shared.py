@@ -52,6 +52,7 @@ b2_executor = ThreadPoolExecutor(max_workers=5)
 cache_omnigen = {"data": [], "timestamp": 0}
 cache_apiframe = {"data": [], "timestamp": 0}
 cache_video = {"data": [], "timestamp": 0}
+cache_kling = {"data": [], "timestamp": 0}  # Kling videos
 GALLERY_CACHE_TTL = 300  # 5 minutes
 
 
@@ -76,8 +77,8 @@ def _sync_put_object(image_data: bytes, key: str, content_type: str = 'image/png
         return ""
 
 
-async def upload_video_to_b2(video_data: bytes) -> str:
-    """Upload video data directly to B2 in 'video' folder (no re-download)"""
+async def upload_video_to_b2(video_data: bytes, folder: str = "video") -> str:
+    """Upload video data directly to B2 (no re-download). Folder auto-created if not exists."""
     try:
         if not video_data:
             print("[B2 Video] No video data provided")
@@ -88,7 +89,7 @@ async def upload_video_to_b2(video_data: bytes) -> str:
             return ""
         
         filename = f"{int(time.time())}_{uuid.uuid4().hex[:6]}.mp4"
-        key = f"video/{filename}"
+        key = f"{folder}/{filename}"
         
         print(f"[B2 Video] Uploading {len(video_data):,} bytes to {key}...")
         
@@ -287,7 +288,7 @@ def _sync_list_b2_videos(prefix: str = "video") -> list:
 
 async def refresh_cache(target: str = "omnigen") -> list:
     """Refresh specific gallery cache"""
-    global cache_omnigen, cache_apiframe, cache_video
+    global cache_omnigen, cache_apiframe, cache_video, cache_kling
     loop = asyncio.get_running_loop()
     
     if target == "video":
@@ -295,6 +296,12 @@ async def refresh_cache(target: str = "omnigen") -> list:
         cache_video["data"] = files
         cache_video["timestamp"] = time.time()
         return cache_video["data"]
+    
+    if target == "kling":
+        files = await loop.run_in_executor(b2_executor, _sync_list_b2_videos, "kling_video")
+        cache_kling["data"] = files
+        cache_kling["timestamp"] = time.time()
+        return cache_kling["data"]
     
     prefix = "omniGen" if target == "omnigen" else "apiFrame"
     files = await loop.run_in_executor(b2_executor, _sync_list_b2_objects, prefix)
@@ -307,4 +314,5 @@ async def refresh_cache(target: str = "omnigen") -> list:
         cache_apiframe["data"] = files
         cache_apiframe["timestamp"] = time.time()
         return cache_apiframe["data"]
+
 

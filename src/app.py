@@ -19,9 +19,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import routers
-from .pollinations import router as pollinations_router
-from .apiframe import router as apiframe_router
-from .shared import (
+from pollinations import router as pollinations_router
+from apiframe import router as apiframe_router
+from kling import router as kling_router
+from shared import (
     s3_client, 
     b2_executor, 
     _sync_put_object,
@@ -51,6 +52,7 @@ app.add_middleware(
 # Include routers
 app.include_router(pollinations_router)
 app.include_router(apiframe_router)
+app.include_router(kling_router)
 
 # Setup directories
 BASE_DIR = Path(__file__).parent.parent
@@ -211,3 +213,7 @@ async def page_apiframe():
 @app.get("/video")
 async def page_video():
     return FileResponse(static_dir / "video.html")
+
+@app.get("/kling")
+async def page_kling():
+    return FileResponse(static_dir / "kling.html")

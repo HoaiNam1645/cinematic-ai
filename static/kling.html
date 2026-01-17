@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kling AI - Cinematic Video</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FAFAFA;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: #fff;
+            border-right: 1px solid #E5E5E5;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #6366F1;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            color: #fff;
+        }
+
+        .nav-tab:not(.active) {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .nav-tab:not(.active):hover {
+            background: #E5E5E5;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .kling-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            color: #fff;
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: #F0F0F0;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.5rem 0.6rem;
+            border: none;
+            background: transparent;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .mode-btn.active {
+            background: #fff;
+            color: #3B82F6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form Elements */
+        select,
+        textarea,
+        input[type="range"] {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3B82F6;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Model Cards */
+        .model-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .model-card {
+            padding: 0.8rem;
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .model-card:hover {
+            border-color: #3B82F6;
+        }
+
+        .model-card.active {
+            border-color: #3B82F6;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .model-card .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .model-card .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .model-card .desc {
+            font-size: 0.65rem;
+            color: #888;
+            margin-top: 0.2rem;
+        }
+
+        /* Quality Mode */
+        .quality-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .quality-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: 2px solid #E5E5E5;
+            background: #fff;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quality-btn.active {
+            border-color: #3B82F6;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            color: #fff;
+        }
+
+        .quality-btn .badge {
+            display: block;
+            font-size: 0.6rem;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+        }
+
+        /* Duration Slider */
+        .duration-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .duration-row input[type="range"] {
+            flex: 1;
+            padding: 0;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #E5E5E5;
+            border-radius: 3px;
+            border: none;
+        }
+
+        .duration-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .duration-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+            color: #3B82F6;
+        }
+
+        /* Aspect Ratio */
+        .aspect-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .aspect-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: 2px solid #E5E5E5;
+            background: #fff;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .aspect-btn.active {
+            border-color: #3B82F6;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+        }
+
+        /* Source Image */
+        .source-image {
+            display: none;
+        }
+
+        .source-image.visible {
+            display: block;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px dashed #D0D0D0;
+            background: #FAFAFA;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .upload-btn:hover {
+            border-color: #3B82F6;
+            background: #F0F5FF;
+        }
+
+        .source-preview {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Generate Button */
+        .btn-generate {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px -1px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-generate:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .status.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #E0E0E0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        /* Main Content */
+        .main {
+            display: flex;
+            flex-direction: column;
+            background: #F3F4F6;
+            height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+            padding-bottom: 0;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #9CA3AF;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .video-container {
+            display: none;
+            flex: 1;
+            width: 100%;
+            max-width: 1024px;
+            margin: 0 auto;
+            position: relative;
+            background: #000;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .video-container.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-container video {
+            width: 100%;
+            max-height: calc(100vh - 200px);
+            object-fit: contain;
+        }
+
+        .video-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+
+        /* Gallery */
+        .gallery-wrapper {
+            position: relative;
+            background: #fff;
+            border-top: 1px solid #E5E5E5;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            flex-shrink: 0;
+            min-height: 100px;
+        }
+
+        .gallery {
+            display: flex;
+            gap: 12px;
+            padding: 0 50px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            width: 100%;
+        }
+
+        .gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-item {
+            width: 120px;
+            height: 70px;
+            min-width: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            position: relative;
+            background: #111;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border-color: #3B82F6;
+        }
+
+        .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.4rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #E5E5E5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .gallery-nav-btn:hover {
+            background: #3B82F6;
+            color: white;
+            border-color: #3B82F6;
+        }
+
+        .gallery-nav-btn.prev {
+            left: 8px;
+        }
+
+        .gallery-nav-btn.next {
+            right: 8px;
+        }
+
+        /* CFG Scale */
+        .cfg-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cfg-row input[type="range"] {
+            flex: 1;
+        }
+
+        .cfg-value {
+            min-width: 35px;
+            text-align: center;
+            font-weight: 600;
+            color: #3B82F6;
+        }
+
+        /* Presets */
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .preset-btn {
+            padding: 0.3rem 0.6rem;
+            border: 1px solid #E5E5E5;
+            background: #fff;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            border-color: #3B82F6;
+            background: #F0F5FF;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+            padding: 0.8rem;
+            font-size: 0.75rem;
+            color: #555;
+        }
+
+        .info-box strong {
+            color: #3B82F6;
+        }
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .sidebar {
+                height: auto;
+                max-height: none;
+                /* Allow full height */
+                border-right: none;
+                border-bottom: 1px solid #E5E5E5;
+                padding: 1rem;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .preview-area {
+                min-height: 250px;
+                max-height: 350px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                padding: 0.75rem;
+                gap: 0.6rem;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .subtitle {
+                font-size: 0.75rem;
+            }
+
+            .nav-tabs {
+                gap: 0.25rem;
+            }
+
+            .nav-tab {
+                padding: 0.4rem 0.25rem;
+                font-size: 0.65rem;
+            }
+
+            .mode-toggle {
+                gap: 0.25rem;
+            }
+
+            .mode-btn {
+                padding: 0.5rem 0.4rem;
+                font-size: 0.7rem;
+            }
+
+            .quality-toggle {
+                gap: 0.25rem;
+            }
+
+            .quality-btn {
+                padding: 0.5rem 0.4rem;
+                font-size: 0.7rem;
+            }
+
+            .quality-btn .badge {
+                font-size: 0.55rem;
+            }
+
+            .aspect-toggle {
+                gap: 0.25rem;
+            }
+
+            .aspect-btn {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.65rem;
+            }
+
+            label {
+                font-size: 0.75rem;
+            }
+
+            select,
+            textarea,
+            input[type="text"] {
+                font-size: 0.85rem;
+                padding: 0.6rem;
+            }
+
+            textarea {
+                min-height: 60px;
+            }
+
+            .presets {
+                gap: 0.25rem;
+            }
+
+            .preset-btn {
+                font-size: 0.6rem;
+                padding: 0.25rem 0.5rem;
+            }
+
+            .gen-btn {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+
+            .preview-area {
+                min-height: 200px;
+                max-height: 280px;
+            }
+
+            .gallery {
+                gap: 0.5rem;
+            }
+
+            .gallery video {
+                width: 120px;
+                height: 70px;
+            }
+
+            /* Pricing button smaller on mobile */
+            .sidebar>div:first-of-type button {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            /* Multi-image grid */
+            #multi-container>div:nth-child(2) {
+                gap: 6px;
+            }
+
+            .multi-slot {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .mode-btn {
+                font-size: 0.6rem;
+                padding: 0.4rem 0.3rem;
+            }
+
+            .quality-btn {
+                font-size: 0.6rem;
+            }
+
+            .quality-btn .badge {
+                display: none;
+            }
+
+            h1 {
+                font-size: 1.1rem;
+            }
+
+            .kling-tag {
+                font-size: 0.55rem;
+                padding: 2px 6px;
+            }
+
+            .nav-tab {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <a href="./" class="back-link">← Trang chủ</a>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h1>Kling AI <span class="kling-tag">PRO</span></h1>
+                    <p class="subtitle">Tạo video AI cao cấp từ Kuaishou</p>
+                </div>
+                <button onclick="showPricingModal()"
+                    style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                    💰 Bảng giá
+                </button>
+            </div>
+
+            <!-- Mode Toggle -->
+            <div>
+                <label>Chế độ tạo</label>
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="mode-text2video" onclick="setMode('text2video')">✏️ Văn
+                        bản</button>
+                    <button class="mode-btn" id="mode-img2video" onclick="setMode('img2video')">🖼 Ảnh đơn</button>
+                    <button class="mode-btn" id="mode-multi" onclick="setMode('multi')">📷 Đa ảnh</button>
+                </div>
+            </div>
+
+            <!-- Model Selection -->
+            <div>
+                <label>Phiên bản Model</label>
+                <select id="model-select" onchange="setModel(this.value)">
+                    <optgroup label="Version 1.x (Tiết kiệm)">
+                        <option value="kling-v1" data-modes="text,img">v1 - $0.14/5s</option>
+                        <option value="kling-v1-5" data-modes="img">v1.5 - $0.28/5s (Chỉ Ảnh)</option>
+                        <option value="kling-v1-6" data-modes="text,img,multi" selected>v1.6 - $0.28/5s ⭐</option>
+                    </optgroup>
+                    <optgroup label="Version 2.x (Cao cấp)">
+                        <option value="kling-v2-5-turbo" data-modes="text,img">v2.5 Turbo ⚡ - $0.21/5s</option>
+                        <option value="kling-v2-6" data-modes="text,img">v2.6 🆕 - $0.35/5s pro</option>
+                        <option value="kling-v2-1" data-modes="img">v2.1 - $0.28/5s (Chỉ Ảnh)</option>
+                        <option value="kling-v2-master" data-modes="text,img">v2 Master 💎 - $1.40/5s</option>
+                        <option value="kling-v2-1-master" data-modes="text,img">v2.1 Master 💎 - $1.40/5s</option>
+                    </optgroup>
+                </select>
+                <p id="model-info" style="font-size: 11px; color: #888; margin-top: 4px;"></p>
+            </div>
+
+            <!-- Quality Mode -->
+            <div>
+                <label>Chế độ chất lượng</label>
+                <div class="quality-toggle">
+                    <button class="quality-btn active" id="quality-std" onclick="setQuality('std')">
+                        Tiêu chuẩn
+                        <span class="badge">Nhanh hơn</span>
+                    </button>
+                    <button class="quality-btn" id="quality-pro" onclick="setQuality('pro')">
+                        Chuyên nghiệp
+                        <span class="badge">Chất lượng cao</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Source Image (Single) -->
+            <div class="source-image" id="source-container">
+                <label>Ảnh nguồn</label>
+                <img id="source-preview" class="source-preview" src="" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('file-upload').click()">
+                    📁 Tải ảnh lên
+                </button>
+            </div>
+
+            <!-- Multi-Image Container -->
+            <div id="multi-container" style="display: none;">
+                <label>Ảnh tham chiếu (1-4 ảnh) <span style="color: #888; font-size: 11px;">Chỉ Kling
+                        v1.6</span></label>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px;">
+                    <div class="multi-slot" id="multi-slot-0" onclick="triggerMultiUpload(0)"
+                        style="border: 2px dashed #ddd; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: #f9f9f9;">
+                        <span style="color: #888;">+ Ảnh 1</span>
+                    </div>
+                    <div class="multi-slot" id="multi-slot-1" onclick="triggerMultiUpload(1)"
+                        style="border: 2px dashed #ddd; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: #f9f9f9;">
+                        <span style="color: #888;">+ Ảnh 2</span>
+                    </div>
+                    <div class="multi-slot" id="multi-slot-2" onclick="triggerMultiUpload(2)"
+                        style="border: 2px dashed #ddd; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: #f9f9f9;">
+                        <span style="color: #888;">+ Ảnh 3</span>
+                    </div>
+                    <div class="multi-slot" id="multi-slot-3" onclick="triggerMultiUpload(3)"
+                        style="border: 2px dashed #ddd; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: #f9f9f9;">
+                        <span style="color: #888;">+ Ảnh 4</span>
+                    </div>
+                </div>
+                <input type="file" id="multi-file-upload" accept="image/*" style="display: none;"
+                    onchange="handleMultiFileUpload(this)">
+                <p style="font-size: 11px; color: #888; margin-top: 6px; text-align: center;">Tải lên các đối tượng khác
+                    nhau để tạo video tương tác</p>
+            </div>
+
+            <!-- Prompt -->
+            <div>
+                <label id="prompt-label">Mô tả Video</label>
+                <textarea id="prompt" placeholder="Mô tả chuyển động video, góc quay camera và cảnh..."></textarea>
+                <div class="presets">
+                    <button class="preset-btn" onclick="setPreset('Camera đẩy vào chậm, ánh sáng điện ảnh')">🎥
+                        Điện ảnh</button>
+                    <button class="preset-btn" onclick="setPreset('Chuyển động chậm, không khí huyền ảo, vải bay')">✨
+                        Huyền ảo</button>
+                    <button class="preset-btn" onclick="setPreset('Camera chuyển động mạnh, cảnh hành động')">⚡
+                        Hành động</button>
+                    <button class="preset-btn" onclick="setPreset('Zoom ra nhẹ nhàng, cảnh thiên nhiên yên bình')">🌿
+                        Thiên nhiên</button>
+                </div>
+            </div>
+
+            <!-- Negative Prompt -->
+            <div>
+                <label>Prompt phủ định (Tùy chọn)</label>
+                <textarea id="negative-prompt" placeholder="Những yếu tố cần tránh: mờ, méo, chất lượng thấp..."
+                    style="min-height: 60px;"></textarea>
+            </div>
+
+            <!-- Duration -->
+            <div>
+                <label>Thời lượng</label>
+                <div class="duration-row">
+                    <input type="range" id="duration" min="5" max="10" step="5" value="5" oninput="updateDuration()">
+                    <span class="duration-value" id="duration-value">5s</span>
+                </div>
+            </div>
+
+            <!-- Aspect Ratio -->
+            <div>
+                <label>Tỷ lệ khung hình</label>
+                <div class="aspect-buttons">
+                    <button class="aspect-btn active" id="aspect-16-9" onclick="setAspect('16:9')">16:9
+                        Ngang</button>
+                    <button class="aspect-btn" id="aspect-9-16" onclick="setAspect('9:16')">9:16 Dọc</button>
+                    <button class="aspect-btn" id="aspect-1-1" onclick="setAspect('1:1')">1:1 Vuông</button>
+                </div>
+            </div>
+
+            <!-- CFG Scale -->
+            <div>
+                <label>Độ sáng tạo (CFG)</label>
+                <div class="cfg-row">
+                    <input type="range" id="cfg-scale" min="0" max="1" step="0.1" value="0.5" oninput="updateCfg()">
+                    <span class="cfg-value" id="cfg-value">0.5</span>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <strong>💡 Mẹo:</strong> Để có kết quả tốt nhất, hãy mô tả chuyển động camera (pan, zoom, tilt) và chi
+                tiết
+                chuyển động. CFG cao = bám sát prompt hơn.
+            </div>
+
+            <button class="btn-generate" id="gen-btn" onclick="generate()">⚡ Tạo video với Kling AI</button>
+
+            <div class="status" id="status">
+                <span>Đang tạo video...</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+            </div>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="file-upload" accept="image/*" style="display: none;"
+                onchange="handleFileUpload(this)">
+        </aside>
+
+        <main class="main">
+            <div class="empty-state" id="empty-state">
+                <div class="icon">⚡</div>
+                <p>Video Kling AI của bạn sẽ xuất hiện tại đây</p>
+            </div>
+
+            <div class="video-container" id="video-container">
+                <video id="result-video" controls></video>
+                <div class="video-actions">
+                    <button class="action-btn" onclick="downloadVideo()" title="Tải xuống">⬇️</button>
+                    <button class="action-btn" onclick="closeVideo()" title="Đóng">✕</button>
+                </div>
+            </div>
+
+            <div class="gallery-wrapper">
+                <button class="gallery-nav-btn prev" onclick="scrollGallery(-1)">❮</button>
+                <div class="gallery" id="gallery">
+                    <!-- Videos will be loaded here -->
+                </div>
+                <button class="gallery-nav-btn next" onclick="scrollGallery(1)">❯</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Pricing Modal -->
+    <div id="pricing-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+        <div
+            style="background: white; border-radius: 16px; max-width: 800px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div
+                style="padding: 20px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; border-radius: 16px 16px 0 0;">
+                <h2 style="margin: 0; font-size: 20px;">💰 Bảng giá Kling AI</h2>
+                <button onclick="closePricingModal()"
+                    style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
+            </div>
+            <div style="padding: 20px 24px;">
+                <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Giá tính theo <strong>Points</strong> - 1
+                    Point = $0.14 USD</p>
+
+                <!-- 5 seconds table -->
+                <h3 style="font-size: 15px; margin: 0 0 12px 0; color: #333;">⏱️ Video 5 giây</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                            <th style="padding: 12px; text-align: left; border-radius: 8px 0 0 0;">Model</th>
+                            <th style="padding: 12px; text-align: center;">✏️ Text→Video</th>
+                            <th style="padding: 12px; text-align: center;">🖼 Image→Video</th>
+                            <th style="padding: 12px; text-align: center; border-radius: 0 8px 0 0;">📷 Multi-Image</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #f9fafb;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v1</strong> <span
+                                    style="color: #888; font-size: 11px;">Nhanh</span></td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">1pt /
+                                <span style="color: #10b981; font-weight: 600;">$0.14</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">1pt /
+                                <span style="color: #10b981; font-weight: 600;">$0.14</span>
+                            </td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v1.5</strong> <span
+                                    style="color: #f59e0b; font-size: 11px;">Chỉ Ảnh</span></td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2pt /
+                                <span style="color: #3b82f6; font-weight: 600;">$0.28</span>
+                            </td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #ecfdf5;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v1.6</strong> ⭐ <span
+                                    style="color: #10b981; font-size: 11px;">Khuyên dùng</span></td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2pt /
+                                <span style="color: #3b82f6; font-weight: 600;">$0.28</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2pt /
+                                <span style="color: #3b82f6; font-weight: 600;">$0.28</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2pt /
+                                <span style="color: #3b82f6; font-weight: 600;">$0.28</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2.1</strong> <span
+                                    style="color: #f59e0b; font-size: 11px;">Chỉ Ảnh</span></td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2pt /
+                                <span style="color: #3b82f6; font-weight: 600;">$0.28</span>
+                            </td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #eff6ff;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2.5 Turbo</strong> ⚡
+                                <span style="color: #3b82f6; font-size: 11px;">Giá tốt</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">1.5pt /
+                                <span style="color: #10b981; font-weight: 600;">$0.21</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">1.5pt /
+                                <span style="color: #10b981; font-weight: 600;">$0.21</span>
+                            </td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2.6</strong> 🆕
+                                <span style="color: #8b5cf6; font-size: 11px;">Mới nhất</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2.5pt /
+                                <span style="color: #6366f1; font-weight: 600;">$0.35</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2.5pt /
+                                <span style="color: #6366f1; font-weight: 600;">$0.35</span>
+                            </td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #fef3c7;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2 Master</strong> 💎
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">10pt /
+                                <span style="color: #f59e0b; font-weight: 600;">$1.40</span>
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">10pt /
+                                <span style="color: #f59e0b; font-weight: 600;">$1.40</span>
+                            </td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #fef3c7;">
+                            <td style="padding: 10px 12px;"><strong>v2.1 Master</strong> 💎</td>
+                            <td style="padding: 10px 12px; text-align: center;">10pt / <span
+                                    style="color: #f59e0b; font-weight: 600;">$1.40</span></td>
+                            <td style="padding: 10px 12px; text-align: center;">10pt / <span
+                                    style="color: #f59e0b; font-weight: 600;">$1.40</span></td>
+                            <td style="padding: 10px 12px; text-align: center; color: #999;">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 10 seconds table -->
+                <h3 style="font-size: 15px; margin: 0 0 12px 0; color: #333;">⏱️ Video 10 giây <span
+                        style="font-weight: normal; color: #888;">(x2)</span></h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color: white;">
+                            <th style="padding: 12px; text-align: left; border-radius: 8px 0 0 0;">Model</th>
+                            <th style="padding: 12px; text-align: center;">✏️ Text→Video</th>
+                            <th style="padding: 12px; text-align: center;">🖼 Image→Video</th>
+                            <th style="padding: 12px; text-align: center; border-radius: 0 8px 0 0;">📷 Multi-Image</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #f9fafb;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v1</strong></td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2pt /
+                                $0.28</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">2pt /
+                                $0.28</td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v1.5</strong></td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">4pt /
+                                $0.56</td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #ecfdf5;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v1.6</strong> ⭐</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">4pt /
+                                $0.56</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">4pt /
+                                $0.56</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">4pt /
+                                $0.56</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2.1</strong></td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">4pt /
+                                $0.56</td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #eff6ff;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2.5 Turbo</strong> ⚡
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">3pt /
+                                $0.42</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">3pt /
+                                $0.42</td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2.6</strong> 🆕</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">5pt /
+                                $0.70</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">5pt /
+                                $0.70</td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #fef3c7;">
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee;"><strong>v2 Master</strong> 💎
+                            </td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">20pt /
+                                $2.80</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center;">20pt /
+                                $2.80</td>
+                            <td
+                                style="padding: 10px 12px; border-bottom: 1px solid #eee; text-align: center; color: #999;">
+                                —</td>
+                        </tr>
+                        <tr style="background: #fef3c7;">
+                            <td style="padding: 10px 12px;"><strong>v2.1 Master</strong> 💎</td>
+                            <td style="padding: 10px 12px; text-align: center;">20pt / $2.80</td>
+                            <td style="padding: 10px 12px; text-align: center;">20pt / $2.80</td>
+                            <td style="padding: 10px 12px; text-align: center; color: #999;">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div
+                    style="margin-top: 16px; padding: 12px; background: #f0f9ff; border-radius: 8px; font-size: 12px; color: #0369a1;">
+                    <strong>💡 Gợi ý:</strong> v2.5 Turbo có giá tốt nhất cho chất lượng v2. v1.6 là lựa chọn cân bằng
+                    cho đa số trường hợp.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'text2video';
+        let currentModel = 'kling-v1-6';
+        let currentQuality = 'std';
+        let currentAspect = '16:9';
+        let sourceImageUrl = null;
+        let currentVideoUrl = null;
+        let multiImageUrls = [null, null, null, null];  // For multi-image mode
+        let currentMultiSlot = 0;
+
+        // Pricing Modal Functions
+        function showPricingModal() {
+            const modal = document.getElementById('pricing-modal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePricingModal() {
+            const modal = document.getElementById('pricing-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('pricing-modal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closePricingModal();
+            }
+        });
+
+        function setMode(mode) {
+            currentMode = mode;
+            const t2vBtn = document.getElementById('mode-text2video');
+            const i2vBtn = document.getElementById('mode-img2video');
+            const multiBtn = document.getElementById('mode-multi');
+            const sourceContainer = document.getElementById('source-container');
+            const multiContainer = document.getElementById('multi-container');
+            const modelSelect = document.getElementById('model-select');
+            const modelContainer = modelSelect.closest('div');
+
+            t2vBtn.classList.remove('active');
+            i2vBtn.classList.remove('active');
+            multiBtn.classList.remove('active');
+            sourceContainer.classList.remove('visible');
+            multiContainer.style.display = 'none';
+
+            // Map mode to data-modes value
+            const modeKey = mode === 'text2video' ? 'text' : (mode === 'img2video' ? 'img' : 'multi');
+
+            // Enable/disable model options based on mode
+            const options = modelSelect.querySelectorAll('option');
+            options.forEach(opt => {
+                const supportedModes = opt.getAttribute('data-modes') || '';
+                if (supportedModes.includes(modeKey)) {
+                    opt.disabled = false;
+                    opt.style.color = '';
+                } else {
+                    opt.disabled = true;
+                    opt.style.color = '#999';
+                }
+            });
+
+            if (mode === 'text2video') {
+                t2vBtn.classList.add('active');
+                modelSelect.disabled = false;
+                modelContainer.style.opacity = '1';
+                modelContainer.title = '';
+                // If current model not supported, switch to v1.6
+                const currentOpt = modelSelect.querySelector(`option[value="${currentModel}"]`);
+                if (currentOpt && currentOpt.disabled) {
+                    modelSelect.value = 'kling-v1-6';
+                    setModel('kling-v1-6');
+                }
+            } else if (mode === 'img2video') {
+                i2vBtn.classList.add('active');
+                sourceContainer.classList.add('visible');
+                modelSelect.disabled = false;
+                modelContainer.style.opacity = '1';
+                modelContainer.title = '';
+            } else if (mode === 'multi') {
+                multiBtn.classList.add('active');
+                multiContainer.style.display = 'block';
+                // Multi-image only supports v1.6 - disable model selection
+                modelSelect.value = 'kling-v1-6';
+                modelSelect.disabled = true;
+                modelContainer.style.opacity = '0.6';
+                modelContainer.title = 'Chế độ Đa ảnh chỉ hỗ trợ Kling v1.6';
+                setModel('kling-v1-6');
+                document.getElementById('model-info').textContent = '🔒 Đa ảnh chỉ hỗ trợ Kling v1.6';
+                document.getElementById('model-info').style.color = '#8b5cf6';
+            }
+        }
+
+        function setModel(model) {
+            currentModel = model;
+            const cfgContainer = document.getElementById('cfg-scale').closest('div').parentElement;
+            const qualityToggle = document.querySelector('.quality-toggle').parentElement;
+            const modelInfo = document.getElementById('model-info');
+            const isMaster = model.includes('master');
+            const isV2 = model.includes('v2');
+
+            // CFG scale only supported for v1.x models
+            if (isV2) {
+                cfgContainer.style.opacity = '0.5';
+                cfgContainer.title = 'CFG không hỗ trợ cho v2.x';
+            } else {
+                cfgContainer.style.opacity = '1';
+                cfgContainer.title = '';
+            }
+
+            // Master models don't have std/pro mode choice
+            if (isMaster) {
+                qualityToggle.style.opacity = '0.5';
+                qualityToggle.title = 'Master chỉ có 1 chế độ chất lượng cao nhất';
+                modelInfo.textContent = '💎 Master: Chất lượng cao nhất, giá $1.40/5s';
+                modelInfo.style.color = '#f59e0b';
+            } else if (model === 'kling-v2-6') {
+                qualityToggle.style.opacity = '1';
+                qualityToggle.title = '';
+                modelInfo.textContent = '🆕 V2.6: Mới nhất, hỗ trợ tạo video có âm thanh';
+                modelInfo.style.color = '#10b981';
+            } else if (model === 'kling-v2-5-turbo') {
+                qualityToggle.style.opacity = '1';
+                qualityToggle.title = '';
+                modelInfo.textContent = '⚡ V2.5 Turbo: Nhanh nhất v2, giá tốt nhất $0.21/5s std';
+                modelInfo.style.color = '#3b82f6';
+            } else {
+                qualityToggle.style.opacity = '1';
+                qualityToggle.title = '';
+                modelInfo.textContent = '';
+            }
+        }
+
+        function setQuality(quality) {
+            currentQuality = quality;
+            document.querySelectorAll('.quality-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('quality-' + quality).classList.add('active');
+        }
+
+        function setAspect(aspect) {
+            currentAspect = aspect;
+            document.querySelectorAll('.aspect-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('aspect-' + aspect.replace(':', '-')).classList.add('active');
+        }
+
+        function setPreset(text) {
+            document.getElementById('prompt').value = text;
+        }
+
+        function updateDuration() {
+            const val = document.getElementById('duration').value;
+            document.getElementById('duration-value').textContent = val + 's';
+        }
+
+        function updateCfg() {
+            const val = document.getElementById('cfg-scale').value;
+            document.getElementById('cfg-value').textContent = val;
+        }
+
+        async function handleFileUpload(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.b2_url) {
+                    sourceImageUrl = data.b2_url;
+                    const preview = document.getElementById('source-preview');
+                    preview.src = data.b2_url;
+                    preview.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Upload failed:', e);
+                alert('Tải ảnh thất bại.');
+            }
+        }
+
+        // Multi-image functions
+        function triggerMultiUpload(slot) {
+            currentMultiSlot = slot;
+            document.getElementById('multi-file-upload').click();
+        }
+
+        async function handleMultiFileUpload(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const slot = document.getElementById('multi-slot-' + currentMultiSlot);
+            slot.innerHTML = '<span style="color: #888;">⏳</span>';
+
+            try {
+                const response = await fetch('api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.b2_url) {
+                    multiImageUrls[currentMultiSlot] = data.b2_url;
+                    slot.innerHTML = `<img src="${data.b2_url}" style="width:100%; height:100%; object-fit:cover;">`;
+                    slot.style.border = '2px solid #10b981';
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (e) {
+                console.error('Multi upload failed:', e);
+                slot.innerHTML = `<span style="color: #ef4444;">❌</span>`;
+                slot.style.border = '2px dashed #ef4444';
+            }
+
+            input.value = '';  // Reset input
+        }
+
+        async function generate() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                alert('Vui lòng nhập mô tả video');
+                return;
+            }
+
+            if (currentMode === 'img2video' && !sourceImageUrl) {
+                alert('Vui lòng tải lên ảnh nguồn');
+                return;
+            }
+
+            if (currentMode === 'multi') {
+                const validUrls = multiImageUrls.filter(url => url !== null);
+                if (validUrls.length < 1) {
+                    alert('Vui lòng tải lên ít nhất 1 ảnh cho chế độ Đa ảnh');
+                    return;
+                }
+            }
+
+            const duration = document.getElementById('duration').value;
+            const cfgScale = parseFloat(document.getElementById('cfg-scale').value);
+            const negativePrompt = document.getElementById('negative-prompt').value.trim();
+
+            const btn = document.getElementById('gen-btn');
+            const status = document.getElementById('status');
+            const progress = document.getElementById('progress');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Đang tạo...';
+            status.classList.add('visible');
+            progress.style.width = '0%';
+
+            let progressVal = 0;
+            const progressInterval = setInterval(() => {
+                progressVal += Math.random() * 3;
+                if (progressVal > 90) progressVal = 90;
+                progress.style.width = progressVal + '%';
+            }, 1000);
+
+            try {
+                let endpoint = 'api/generate/kling/video';
+                let payload = {
+                    prompt: prompt,
+                    model: currentModel,
+                    mode: currentQuality,
+                    duration: duration,
+                    aspect_ratio: currentAspect,
+                    cfg_scale: cfgScale
+                };
+
+                if (negativePrompt) {
+                    payload.negative_prompt = negativePrompt;
+                }
+
+                if (currentMode === 'img2video' && sourceImageUrl) {
+                    payload.image_url = sourceImageUrl;
+                } else if (currentMode === 'multi') {
+                    // Use multi-image endpoint with different payload
+                    endpoint = 'api/generate/kling/multi-image';
+                    const validUrls = multiImageUrls.filter(url => url !== null);
+                    payload = {
+                        prompt: prompt,
+                        image_urls: validUrls,
+                        mode: currentQuality,
+                        duration: duration,
+                        aspect_ratio: currentAspect
+                    };
+                    if (negativePrompt) {
+                        payload.negative_prompt = negativePrompt;
+                    }
+                }
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                clearInterval(progressInterval);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Tạo video thất bại');
+                }
+
+                const result = await response.json();
+                progress.style.width = '100%';
+
+                if (result.b2_url || result.url) {
+                    currentVideoUrl = result.b2_url || result.url;
+                    showVideo(currentVideoUrl);
+                    await refreshGallery();
+                    status.querySelector('span').textContent = '✅ Video đã sẵn sàng!';
+                } else {
+                    throw new Error('Không nhận được URL video');
+                }
+            } catch (error) {
+                clearInterval(progressInterval);
+                alert('Lỗi: ' + error.message);
+                status.querySelector('span').textContent = '❌ ' + error.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '⚡ Tạo video với Kling AI';
+                setTimeout(() => status.classList.remove('visible'), 3000);
+            }
+        }
+
+        function showVideo(url) {
+            const video = document.getElementById('result-video');
+            const container = document.getElementById('video-container');
+            const emptyState = document.getElementById('empty-state');
+
+            video.src = url;
+            container.classList.add('visible');
+            emptyState.style.display = 'none';
+            video.play();
+        }
+
+        function closeVideo() {
+            document.getElementById('video-container').classList.remove('visible');
+            document.getElementById('empty-state').style.display = 'flex';
+        }
+
+        function downloadVideo() {
+            if (!currentVideoUrl) return;
+            const a = document.createElement('a');
+            a.href = currentVideoUrl;
+            a.download = 'kling_video_' + Date.now() + '.mp4';
+            a.click();
+        }
+
+        function scrollGallery(direction) {
+            const gallery = document.getElementById('gallery');
+            gallery.scrollBy({ left: direction * 300, behavior: 'smooth' });
+        }
+
+        // Video Gallery - Load Kling videos only
+        async function loadVideoGallery() {
+            try {
+                const res = await fetch('api/gallery/kling');
+                if (!res.ok) return;
+                const videos = await res.json();
+
+                const gallery = document.getElementById('gallery');
+                if (videos.length === 0) {
+                    gallery.innerHTML = '<p style="color:#999; font-size:0.8rem;">No Kling videos yet</p>';
+                    return;
+                }
+
+                gallery.innerHTML = videos.map(v => `
+                    <div class="gallery-item" onclick="showVideo('${v.b2_url || v.url}')">
+                        <video src="${v.b2_url || v.url}" muted></video>
+                        <span class="play-icon">▶</span>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to load gallery:', e);
+            }
+        }
+
+        async function refreshGallery() {
+            try {
+                await fetch('api/gallery/refresh/kling', { method: 'POST' });
+                await loadVideoGallery();
+            } catch (e) {
+                console.error('Refresh failed:', e);
+            }
+        }
+
+        // Initialize
+        loadVideoGallery();
+    </script>
+</body>
+
+</html>

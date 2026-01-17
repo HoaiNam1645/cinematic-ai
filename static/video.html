@@ -558,26 +558,125 @@
             background: linear-gradient(135deg, #E040FB, #7C4DFF);
             color: #fff;
         }
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .sidebar {
+                height: auto;
+                max-height: none;
+                /* Removed limit */
+                border-right: none;
+                border-bottom: 1px solid #E5E5E5;
+                padding: 1rem;
+            }
+
+            main {
+                height: auto;
+                min-height: 50vh;
+            }
+
+            .video-container video {
+                max-height: 50vh;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                padding: 0.75rem;
+                gap: 0.6rem;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .subtitle {
+                font-size: 0.75rem;
+            }
+
+            label {
+                font-size: 0.75rem;
+            }
+
+            select,
+            textarea,
+            input[type="text"] {
+                font-size: 0.85rem;
+                padding: 0.6rem;
+            }
+
+            textarea {
+                min-height: 60px;
+            }
+
+            .gen-btn {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+
+            .gallery-wrapper {
+                min-height: 80px;
+                padding: 8px 0;
+            }
+
+            .gallery-item {
+                width: 100px;
+                height: 60px;
+            }
+
+            .video-container {
+                border-radius: 0;
+            }
+
+            .video-actions {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+
+            .action-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="./" class="back-link">← Dashboard</a>
+            <a href="./" class="back-link">← Trang chủ</a>
+
+            <!-- Navigation Tabs -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <a href="pollinations"
+                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">✨
+                    Hình ảnh</a>
+                <a href="video"
+                    style="flex:1; padding: 0.5rem; background: linear-gradient(135deg, #E040FB, #7C4DFF); border-radius: 8px; text-decoration: none; text-align: center; color: #fff; font-size: 0.75rem;">🎬
+                    Video</a>
+                <a href="kling"
+                    style="flex:1; padding: 0.5rem; background: #F0F0F0; border-radius: 8px; text-decoration: none; text-align: center; color: #666; font-size: 0.75rem;">⚡
+                    Kling</a>
+            </div>
 
             <div>
                 <h1>Video AI <span class="video-tag">VIDEO</span></h1>
-                <p class="subtitle">Generate cinematic videos with AI</p>
+                <p class="subtitle">Tạo video điện ảnh với AI</p>
             </div>
 
             <!-- Mode Toggle -->
             <div>
-                <label>Mode</label>
+                <label>Chế độ</label>
                 <div class="mode-toggle">
-                    <button class="mode-btn active" id="mode-text2video" onclick="setMode('text2video')">✨ Text →
+                    <button class="mode-btn active" id="mode-text2video" onclick="setMode('text2video')">✨ Văn bản →
                         Video</button>
-                    <button class="mode-btn" id="mode-img2video" onclick="setMode('img2video')">🖼 Image →
+                    <button class="mode-btn" id="mode-img2video" onclick="setMode('img2video')">🖼 Hình ảnh →
                         Video</button>
                 </div>
             </div>
@@ -586,40 +685,41 @@
             <div>
                 <label>Model</label>
                 <select id="model" onchange="onModelChange()">
-                    <option value="seedance">Seedance (2-10s)</option>
-                    <option value="seedance-pro">Seedance Pro (2-10s)</option>
-                    <option value="veo">Veo (4-8s, Audio)</option>
+                    <option value="seedance">Seedance (Tiêu chuẩn)</option>
+                    <option value="seedance-pro">Seedance Pro (Chất lượng cao)</option>
+                    <option value="veo">Google Veo (Có âm thanh)</option>
                 </select>
             </div>
 
             <!-- Source Image (for img2video) -->
             <div class="source-image" id="source-container">
-                <label>Source Image</label>
+                <label>Ảnh nguồn</label>
                 <img id="source-preview" class="source-preview" src="" style="display: none;">
                 <button class="upload-btn" onclick="document.getElementById('file-upload').click()">
-                    📁 Upload Image
+                    📁 Tải ảnh lên
                 </button>
             </div>
 
             <!-- Prompt -->
             <div>
-                <label id="prompt-label">Video Prompt</label>
-                <textarea id="prompt" placeholder="Describe the video motion and scene..."></textarea>
+                <label id="prompt-label">Mô tả Video</label>
+                <textarea id="prompt" placeholder="Mô tả chuyển động và cảnh video..."></textarea>
                 <div class="presets">
-                    <button class="preset-btn" onclick="setPreset('A cat walking in a garden, cinematic')">🐱
-                        Cat</button>
-                    <button class="preset-btn" onclick="setPreset('Ocean waves crashing on beach, sunset')">🌊
-                        Ocean</button>
-                    <button class="preset-btn" onclick="setPreset('City skyline timelapse, night to day')">🌃
-                        City</button>
-                    <button class="preset-btn" onclick="setPreset('Flying through clouds, POV drone shot')">☁️
-                        Clouds</button>
+                    <button class="preset-btn" onclick="setPreset('Một chú mèo đang đi trong vườn, điện ảnh')">🐱
+                        Mèo</button>
+                    <button class="preset-btn" onclick="setPreset('Sóng biển đánh vào bãi cát, hoàng hôn')">🌊
+                        Biển</button>
+                    <button class="preset-btn"
+                        onclick="setPreset('Đường chân trời thành phố, timelapse từ đêm đến ngày')">🌃
+                        Thành phố</button>
+                    <button class="preset-btn" onclick="setPreset('Bay xuyên mây, góc quay drone POV')">☁️
+                        Mây</button>
                 </div>
             </div>
 
             <!-- Duration -->
             <div>
-                <label>Duration</label>
+                <label>Thời lượng</label>
                 <div class="range-container">
                     <input type="range" id="duration" min="2" max="10" value="4" oninput="updateDuration()">
                     <span class="range-value" id="duration-value">4s</span>
@@ -628,24 +728,24 @@
 
             <!-- Aspect Ratio -->
             <div>
-                <label>Aspect Ratio</label>
+                <label>Tỷ lệ khung hình</label>
                 <div class="aspect-buttons">
                     <button class="aspect-btn active" id="aspect-16-9" onclick="setAspect('16:9')">16:9
-                        Landscape</button>
-                    <button class="aspect-btn" id="aspect-9-16" onclick="setAspect('9:16')">9:16 Portrait</button>
+                        Ngang</button>
+                    <button class="aspect-btn" id="aspect-9-16" onclick="setAspect('9:16')">9:16 Dọc</button>
                 </div>
             </div>
 
             <!-- Audio Toggle (Veo only) -->
             <div class="toggle-container" id="audio-container" style="display: none;">
-                <span class="toggle-label">🔊 Generate Audio (Veo)</span>
+                <span class="toggle-label">🔊 Tạo âm thanh (Veo)</span>
                 <div class="toggle" id="audio-toggle" onclick="toggleAudio()"></div>
             </div>
 
-            <button class="btn-generate" id="gen-btn" onclick="generate()">🎬 Generate Video</button>
+            <button class="btn-generate" id="gen-btn" onclick="generate()">🎬 Tạo Video</button>
 
             <div class="status" id="status">
-                <span>Generating video...</span>
+                <span>Đang tạo video...</span>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress"></div>
                 </div>
@@ -662,14 +762,14 @@
                     style="margin-bottom: 16px; color: #d1d5db;">
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
-                <p>Your generated video will appear here</p>
+                <p>Video của bạn sẽ xuất hiện tại đây</p>
             </div>
 
             <div class="video-container" id="video-container">
                 <video id="result-video" controls></video>
                 <div class="video-actions">
-                    <button class="action-btn" onclick="downloadVideo()" title="Download">⬇️</button>
-                    <button class="action-btn" onclick="closeVideo()" title="Close">✕</button>
+                    <button class="action-btn" onclick="downloadVideo()" title="Tải xuống">⬇️</button>
+                    <button class="action-btn" onclick="closeVideo()" title="Đóng">✕</button>
                 </div>
             </div>
 
@@ -716,17 +816,14 @@
             const durationInput = document.getElementById('duration');
             const audioContainer = document.getElementById('audio-container');
 
-            if (model === 'veo') {
+            if (model === 'veo' || model === 'veo3.1') {
                 durationInput.min = 4;
                 durationInput.max = 8;
                 durationInput.step = 2;
                 if (durationInput.value < 4) durationInput.value = 4;
                 if (durationInput.value > 8) durationInput.value = 8;
                 audioContainer.style.display = 'flex';
-
-                if (currentMode === 'img2video') {
-                    setMode('text2video');
-                }
+                // Veo now supports image-to-video, no need to force text2video
             } else {
                 durationInput.min = 2;
                 durationInput.max = 10;
@@ -778,14 +875,14 @@
                 }
             } catch (e) {
                 console.error('Upload failed:', e);
-                alert('Upload failed.');
+                alert('Tải ảnh thất bại.');
             }
         }
 
         async function generate() {
             const prompt = document.getElementById('prompt').value.trim();
             if (!prompt) {
-                alert('Please enter a video description');
+                alert('Vui lòng nhập mô tả video');
                 return;
             }
 
@@ -793,7 +890,7 @@
             const duration = parseInt(document.getElementById('duration').value);
 
             if (currentMode === 'img2video' && !sourceImageUrl) {
-                alert('Please upload a source image for Image → Video mode');
+                alert('Vui lòng tải lên ảnh nguồn cho chế độ Hình ảnh → Video');
                 return;
             }
 
@@ -802,7 +899,7 @@
             const progress = document.getElementById('progress');
 
             btn.disabled = true;
-            btn.textContent = '⏳ Generating...';
+            btn.textContent = '⏳ Đang tạo...';
             status.classList.add('visible');
             progress.style.width = '0%';
 
@@ -826,7 +923,14 @@
                     payload.image_url = sourceImageUrl;
                 }
 
-                const response = await fetch('api/generate/pollinations/video', {
+                // Use dedicated Kling API if kling model selected
+                let apiEndpoint = 'api/generate/pollinations/video';
+                if (model === 'kling') {
+                    apiEndpoint = 'api/generate/kling/video';
+                    payload.mode = 'std';  // std or pro
+                }
+
+                const response = await fetch(apiEndpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -836,7 +940,7 @@
 
                 if (!response.ok) {
                     const error = await response.json();
-                    throw new Error(error.detail || 'Video generation failed');
+                    throw new Error(error.detail || 'Tạo video thất bại');
                 }
 
                 const data = await response.json();
@@ -850,10 +954,10 @@
             } catch (e) {
                 clearInterval(progressInterval);
                 console.error('Generation error:', e);
-                alert('Error: ' + e.message);
+                alert('Lỗi: ' + e.message);
             } finally {
                 btn.disabled = false;
-                btn.textContent = '🎬 Generate Video';
+                btn.textContent = '🎬 Tạo Video';
                 setTimeout(() => status.classList.remove('visible'), 2000);
             }
         }
